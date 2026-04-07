@@ -4,7 +4,8 @@ import { parseArgs } from "node:util";
 import type { VSCodeServerOptions } from "./types.ts";
 import { startCodeServer } from "./server.ts";
 
-const { values } = parseArgs({
+const { values, positionals } = parseArgs({
+  allowPositionals: true,
   options: {
     // Server
     port: { type: "string", short: "p" },
@@ -83,6 +84,7 @@ const { values } = parseArgs({
     "force-disable-user-env": { type: "boolean" },
     "force-user-env": { type: "boolean" },
 
+    open: { type: "boolean", short: "o" },
     help: { type: "boolean", short: "h" },
   },
   strict: true,
@@ -167,6 +169,7 @@ if (values.help) {
         --crash-reporter-directory <dir> Crash reporter directory
         --crash-reporter-id <id>         Crash reporter ID
 
+    -o, --open                           Open in browser on startup
     -h, --help                           Show this help message
 `);
   process.exit(0);
@@ -229,10 +232,16 @@ if (values["logs-path"]) {
   vscode.logsPath = values["logs-path"];
 }
 
+const dir = positionals[0];
+const autoPort0 = !values.port && values.open && !process.env.PORT;
+if (autoPort0 || dir) {
+  vscode["disable-workspace-trust"] = true;
+}
+
 const handle = await startCodeServer({
-  port: values.port ? Number(values.port) : undefined,
+  port: values.port ? Number(values.port) : autoPort0 ? 0 : undefined,
   host: values.host,
-  defaultFolder: values["default-folder"],
+  defaultFolder: dir || values["default-folder"],
   connectionToken: values["connection-token"],
   vscode,
 });
@@ -246,6 +255,23 @@ const c = {
 console.log(
   `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Ready${c.reset} ${c.dim}at${c.reset} ${c.cyan}${handle.url}${c.reset}\n`,
 );
+
+if (values.open) {
+  const { exec } = await import("node:child_process");
+  const url = handle.url;
+  const platform = process.platform;
+  if (platform === "darwin") {
+    exec(
+      `open -na "Google Chrome" --args --app="${url}" || open -na "Chromium" --args --app="${url}" || open "${url}"`,
+    );
+  } else if (platform === "win32") {
+    exec(`start chrome --app="${url}" || start msedge --app="${url}" || start "" "${url}"`);
+  } else {
+    exec(
+      `google-chrome-stable --app="${url}" 2>/dev/null || google-chrome --app="${url}" 2>/dev/null || chromium --app="${url}" 2>/dev/null || xdg-open "${url}"`,
+    );
+  }
+}
 
 let shuttingDown = false;
 const shutdown = () => {

@@ -229,13 +229,15 @@ export async function startCodeServer(
     }
   });
 
+  const actualPort = (server.address() as { port: number }).port;
+
   const url = handler.connectionToken
-    ? `http://localhost:${port}/?tkn=${handler.connectionToken}`
-    : `http://localhost:${port}/`;
+    ? `http://localhost:${actualPort}/?tkn=${handler.connectionToken}`
+    : `http://localhost:${actualPort}/`;
 
   return {
     server,
-    port,
+    port: actualPort,
     url,
     connectionToken: handler.connectionToken,
     async close() {
