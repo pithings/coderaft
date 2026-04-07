@@ -1,0 +1,7 @@
+node_modules
+*.log
+.env*
+.agents
+.claude
+**/dist
+*.tar*

@@ -1,0 +1,8 @@
+{
+  "name": "@vscode/spdlog",
+  "version": "0.15.8",
+  "private": true,
+  "type": "commonjs",
+  "main": "index.js",
+  "types": "index.d.ts"
+}

@@ -1,0 +1,1 @@
+/Users/pooya/Code/code-server/node_modules/.pnpm/code-server@4.114.0_typescript@6.0.2/node_modules/code-server/ThirdPartyNotices.txt

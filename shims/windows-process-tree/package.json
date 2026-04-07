@@ -1,0 +1,7 @@
+{
+  "name": "@vscode/windows-process-tree",
+  "version": "0.6.3",
+  "private": true,
+  "type": "commonjs",
+  "main": "index.js"
+}

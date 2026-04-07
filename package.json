@@ -1,0 +1,46 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "cd lib && pnpm build",
+    "dev": "CODE_MODULES_DIR=lib/node_modules node lib/src/cli.ts",
+    "start": "node lib/dist/cli.mjs",
+    "link-deps": "node scripts/link-deps.ts",
+    "postinstall": "node scripts/link-deps.ts",
+    "fmt": "oxlint . --fix && oxfmt .",
+    "release": "cd lib && pnpm build && npm version patch && git commit -am 'chore: release' && git push --follow-tags && npm publish",
+    "lint": "oxlint . && oxfmt --check .",
+    "prepack": "pnpm build",
+    "test": "pnpm lint && pnpm typecheck",
+    "typecheck": "tsgo --noEmit --skipLibCheck"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@typescript/native-preview": "latest",
+    "obuild": "latest",
+    "oxfmt": "latest",
+    "oxlint": "latest",
+    "vitest": "latest"
+  },
+  "packageManager": "pnpm@10.28.2",
+  "pnpm": {
+    "overrides": {
+      "@github/copilot": "workspace:*",
+      "@github/copilot-sdk": "workspace:*",
+      "vsda": "workspace:*",
+      "@vscode/fs-copyfile": "workspace:*",
+      "@vscode/native-watchdog": "workspace:*",
+      "@vscode/spdlog": "workspace:*",
+      "node-pty": "workspace:node-pty2@*",
+      "@vscode/ripgrep": "workspace:*",
+      "@vscode/deviceid": "workspace:*",
+      "@parcel/watcher": "workspace:*",
+      "fsevents": "workspace:*",
+      "@vscode/windows-process-tree": "workspace:*",
+      "argon2": "workspace:*",
+      "@vscode/proxy-agent": "workspace:*",
+      "@microsoft/1ds-core-js": "workspace:*",
+      "@microsoft/1ds-post-js": "workspace:*"
+    }
+  }
+}

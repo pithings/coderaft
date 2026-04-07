@@ -1,0 +1,7 @@
+{
+  "name": "@vscode/proxy-agent",
+  "version": "0.40.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js"
+}

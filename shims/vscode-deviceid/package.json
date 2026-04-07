@@ -1,0 +1,7 @@
+{
+  "name": "@vscode/deviceid",
+  "version": "0.1.4",
+  "private": true,
+  "type": "module",
+  "main": "./index.js"
+}

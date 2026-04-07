@@ -1,0 +1,11 @@
+{
+  "name": "@github/copilot",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./sdk": "./sdk/index.js"
+  }
+}
