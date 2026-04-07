@@ -82,7 +82,7 @@ const codeMjsPath = join(libDir, "code.mjs");
 const codeMjs = readFileSync(codeMjsPath, "utf8");
 const updatedCodeMjs = codeMjs.replace(
   /const codeArchiveHash = ".*/,
-  `const codeArchiveHash = "${contentHash}"`,
+  `const codeArchiveHash = "${contentHash}";`,
 );
 const hashChanged = updatedCodeMjs !== codeMjs;
 
