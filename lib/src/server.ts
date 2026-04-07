@@ -71,7 +71,8 @@ export interface CodeServerHandle {
 export async function createCodeServer(
   opts: CreateCodeServerOptions = {},
 ): Promise<CodeServerHandler> {
-  const connectionToken = opts.connectionToken ?? randomUUID();
+  const withoutToken = opts.vscode?.["without-connection-token"] === true;
+  const connectionToken = withoutToken ? "" : (opts.connectionToken ?? randomUUID());
   const defaultFolder = opts.defaultFolder ?? process.cwd();
 
   // Stable per-process 32-byte key returned by POST /mint-key. VS Code's
@@ -101,7 +102,7 @@ export async function createCodeServer(
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,
-    "connection-token": connectionToken,
+    ...(withoutToken ? {} : { "connection-token": connectionToken }),
     // Suppress coder/code-server's custom "Getting Started" walkthrough
     // (the promo page linking to cdr.co). Gated by the
     // `isEnabledCoderGettingStarted` context key in the workbench; defaults
@@ -228,7 +229,9 @@ export async function startCodeServer(
     }
   });
 
-  const url = `http://localhost:${port}/?tkn=${handler.connectionToken}`;
+  const url = handler.connectionToken
+    ? `http://localhost:${port}/?tkn=${handler.connectionToken}`
+    : `http://localhost:${port}/`;
 
   return {
     server,
