@@ -252,8 +252,11 @@ const c = {
   dim: "\x1b[2m",
   reset: "\x1b[0m",
 };
+const rss = process.memoryUsage.rss();
+const mem = `${(rss / 1024 / 1024).toFixed(0)} MB`;
 console.log(
-  `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Ready${c.reset} ${c.dim}at${c.reset} ${c.cyan}${handle.url}${c.reset}\n`,
+  `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Ready${c.reset} ${c.dim}at${c.reset} ${c.cyan}${handle.url}${c.reset}` +
+    `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Memory${c.reset} ${c.dim}${mem}${c.reset}\n`,
 );
 
 if (values.open) {
