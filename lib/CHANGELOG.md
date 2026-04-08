@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.0.15
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.14...v0.0.15)
+
+### 🩹 Fixes
+
+- **auth:** Pass `without-connection-token` to vscode server ([2470604](https://github.com/pithings/coderaft/commit/2470604))
+- Update zigpty ([081718c](https://github.com/pithings/coderaft/commit/081718c))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.14
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.13...v0.0.14)
