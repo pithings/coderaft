@@ -2,6 +2,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { homedir } from "node:os";
+import os from "node:os";
 import { join } from "node:path";
 import type { Duplex } from "node:stream";
 import { serveStatic } from "./static.ts";
@@ -96,6 +97,14 @@ export async function createCodeServer(
 
   const { modulesDir } = await loadCode();
   const vsRootPath = join(modulesDir, "code-server", "lib", "vscode");
+
+  // Ensure `os.networkInterfaces()` always returns at least one interface with a
+  // valid MAC. On Termux/Android no real NICs are exposed, causing VS Code's
+  // `getMacAddress()` to throw "Unable to retrieve mac address (unexpected
+  // format)". The machineId then falls back to a random UUID on every boot.
+  // Patching in a deterministic dummy MAC derived from the hostname gives a
+  // stable machineId without touching upstream code.
+  ensureNetworkInterface();
 
   // Load VS Code server module — mute noisy internal logs during init
   const _log = console.log;
@@ -283,6 +292,37 @@ export async function startCodeServer(
       });
     },
   };
+}
+
+function ensureNetworkInterface(): void {
+  const original = os.networkInterfaces;
+  const BLACKLISTED = new Set(["00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff", "ac:de:48:00:11:22"]);
+  const patched = function networkInterfaces() {
+    const ifaces = original.call(os);
+    for (const name in ifaces) {
+      for (const info of ifaces[name]!) {
+        if (info.mac && !BLACKLISTED.has(info.mac)) return ifaces;
+      }
+    }
+    // No valid MAC found — inject a deterministic one derived from hostname
+    const { createHash } = require("node:crypto") as typeof import("node:crypto");
+    const hash = createHash("md5").update(os.hostname()).digest();
+    // Format as a locally-administered unicast MAC (set bit 1 of first octet)
+    hash[0] = (hash[0]! | 0x02) & 0xfe;
+    const mac = [...hash.subarray(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join(":");
+    ifaces._coderaft = [
+      {
+        address: "10.0.0.1",
+        netmask: "255.255.255.0",
+        family: "IPv4",
+        mac,
+        internal: false,
+        cidr: "10.0.0.1/24",
+      },
+    ];
+    return ifaces;
+  } as typeof os.networkInterfaces;
+  os.networkInterfaces = patched;
 }
 
 function cleanupStaleLocks(userDataDir: string): void {
