@@ -8,7 +8,7 @@
     "link-deps": "node scripts/link.ts",
     "postinstall": "node scripts/link.ts",
     "fmt": "oxlint . --fix && oxfmt .",
-    "release": "cd lib && npm version patch --no-git-tag-version && git commit -am 'chore: release' && git tag v$(node -p \"require('./package.json').version\") && git push --follow-tags",
+    "release": "cd lib && npm version patch --no-git-tag-version && git commit -am 'chore: release' && git tag -a v$(node -p \"require('./package.json').version\") -m 'release' && git push --follow-tags",
     "lint": "oxlint . && oxfmt --check .",
     "prepack": "pnpm build",
     "test": "pnpm lint && pnpm typecheck",
