@@ -21,6 +21,7 @@
     "build": "obuild"
   },
   "devDependencies": {
+    "code-server": "^4.114.1",
     "@anthropic-ai/sandbox-runtime": "0.0.42",
     "@github/copilot": "^1.0.11",
     "@github/copilot-sdk": "^0.2.0",
@@ -48,7 +49,6 @@
     "@xterm/addon-webgl": "^0.20.0-beta.190",
     "@xterm/headless": "^6.1.0-beta.191",
     "@xterm/xterm": "^6.1.0-beta.191",
-    "code-server": "^4.114.1",
     "cookie": "^0.7.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.2",
