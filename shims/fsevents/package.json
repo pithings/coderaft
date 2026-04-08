@@ -2,9 +2,6 @@
   "name": "fsevents",
   "version": "2.3.3",
   "private": true,
-  "os": [
-    "darwin"
-  ],
   "type": "commonjs",
   "main": "index.js"
 }
