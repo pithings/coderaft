@@ -1,7 +1,15 @@
 #!/usr/bin/env node
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { existsSync, mkdirSync, readFileSync, realpathSync, symlinkSync, rmSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  realpathSync,
+  symlinkSync,
+  rmSync,
+} from "node:fs";
 
 const rootDir = join(import.meta.dirname!, "..");
 const workspacePkgDir = join(rootDir, "lib");
@@ -12,15 +20,6 @@ const shimsDir = join(rootDir, "shims");
 
 // Extra packages to link that aren't declared in package.json (conditionally loaded at runtime)
 const extraDeps = ["vsda", "@vscode/fs-copyfile"];
-
-// Symlink code-server's ThirdPartyNotices.txt into the workspace package
-// const notices = join(codeServerDir, "ThirdPartyNotices.txt");
-// const noticesLink = join(workspacePkgDir, "ThirdPartyNotices.txt");
-// if (existsSync(notices)) {
-//   if (existsSync(noticesLink)) rmSync(noticesLink);
-//   symlinkSync(realpathSync(notices), noticesLink);
-//   console.log(`Linked ThirdPartyNotices.txt → ${notices}`);
-// }
 
 // Link extra deps into workspace node_modules so tar -ch can resolve them
 for (const dep of extraDeps) {
@@ -96,4 +95,13 @@ for (const targetDir of targets) {
   for (const dep of skippedDeps) {
     console.warn(`  ! ${dep} (not found, skipped)`);
   }
+}
+
+// Copy code-server's ThirdPartyNotices.txt into the workspace package
+const notices = join(codeServerDir, "ThirdPartyNotices.txt");
+const noticesLink = join(workspacePkgDir, "ThirdPartyNotices.txt");
+if (existsSync(notices)) {
+  if (existsSync(noticesLink)) rmSync(noticesLink);
+  copyFileSync(notices, noticesLink);
+  console.log(`Copied ThirdPartyNotices.txt from ${notices}`);
 }
