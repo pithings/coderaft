@@ -231,13 +231,29 @@ export async function startCodeServer(
     handler.handleUpgrade(req, socket);
   });
 
-  await new Promise<void>((resolve) => {
-    if (opts.host) {
-      server.listen(port, opts.host, resolve);
+  const listen = (p: number) =>
+    new Promise<void>((resolve, reject) => {
+      server.once("error", reject);
+      const cb = () => {
+        server.removeListener("error", reject);
+        resolve();
+      };
+      if (opts.host) {
+        server.listen(p, opts.host, cb);
+      } else {
+        server.listen(p, cb);
+      }
+    });
+
+  try {
+    await listen(port);
+  } catch (err: any) {
+    if (err?.code === "EADDRINUSE") {
+      await listen(0);
     } else {
-      server.listen(port, resolve);
+      throw err;
     }
-  });
+  }
 
   const actualPort = (server.address() as { port: number }).port;
 
