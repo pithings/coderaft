@@ -50,21 +50,15 @@ The `sync-deps` script does not need special handling for these — overrides wo
 
 ## Native (NAPI) Dependencies
 
-Total: **~3.3 MB** of `.node` binaries in `packages/code-server/node_modules` (after shimming).
+Remaining `.node` binaries in `lib/node_modules` (after shimming):
 
-| Package                                  | Size   | Arch                           | Build Type |
-| ---------------------------------------- | ------ | ------------------------------ | ---------- |
-| `@github/copilot` (shimmed)              | —      | workspace stub                 | shim       |
-| `@vscode/spdlog` (shimmed)               | —      | workspace stub                 | shim       |
-| `@vscode/native-watchdog` (shimmed)      | —      | workspace stub                 | shim       |
-| `zigpty` (replaces `node-pty`)           | —      | linux/darwin/win32 x x64/arm64 | prebuilds  |
-| `ms-vscode.js-debug` (ext)               | 0.4 MB | win32-x64 + win32-arm64        | bundled    |
-| `microsoft-authentication` (ext)         | 0.4 MB | linux-x64 only                 | bundled    |
-| `@vscode/windows-process-tree` (shimmed) | —      | workspace stub                 | shim       |
-| `@vscode/deviceid`                       | 32K    | linux-x64 only                 | node-gyp   |
-| `@parcel/watcher` (shimmed)              | —      | workspace stub                 | shim       |
-| `fsevents` (shimmed)                     | —      | workspace stub                 | shim       |
-| `argon2` (shimmed)                       | —      | workspace stub                 | shim       |
+| Package                          | Size  | Arch                           | Build Type |
+| -------------------------------- | ----- | ------------------------------ | ---------- |
+| `zigpty` (replaces `node-pty`)   | ~220K | linux/darwin/win32 x x64/arm64 | prebuilds  |
+| `ms-vscode.js-debug` (ext)       | ~460K | win32-x64 + win32-arm64        | bundled    |
+| `microsoft-authentication` (ext) | ~400K | linux-x64 only                 | bundled    |
+
+All other native packages (`@github/copilot`, `@vscode/spdlog`, `@vscode/native-watchdog`, `@vscode/windows-process-tree`, `@vscode/deviceid`, `@parcel/watcher`, `fsevents`, `argon2`) are fully shimmed with zero native binaries.
 
 ### Packages with `binding.gyp` but no compiled binaries
 
@@ -73,7 +67,5 @@ Total: **~3.3 MB** of `.node` binaries in `packages/code-server/node_modules` (a
 
 ### Notes
 
-- `@github/copilot` was 77% of total native binary size (mostly clipboard) — now shimmed out
-- Multi-arch prebuild packages ship binaries for all 6 platforms; only one is used at runtime
-- node-gyp packages are compiled for host arch only (linux-x64 in current install)
-- `node_modules/code-server/lib/vscode/node_modules/` contains duplicate copies of top-level native deps
+- `zigpty` ships prebuilds for 8 platform/arch combinations; only one is used at runtime
+- `ms-vscode.js-debug` and `microsoft-authentication` are VS Code bundled extensions with platform-specific binaries that cannot be shimmed
