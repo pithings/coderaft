@@ -277,8 +277,12 @@ if (values.open) {
 
 let shuttingDown = false;
 const shutdown = () => {
-  if (shuttingDown) return;
+  if (shuttingDown) {
+    process.exit(0);
+  }
   shuttingDown = true;
+  // Force exit after 3s if graceful shutdown hangs
+  setTimeout(() => process.exit(0), 3000).unref();
   handle.close().finally(() => process.exit(0));
 };
 process.on("SIGINT", shutdown);
