@@ -34,15 +34,21 @@ Compared to [`code-server`](https://www.npmjs.com/package/code-server) and [`ope
 
 </details>
 
-## CLI Usage
+## CLI
 
-Start a an instance:
+Start an instance:
 
 ```sh
 npx coderaft -o .
 ```
 
-## Programmatic Usage
+### Docker
+
+```sh
+docker run -it --rm -p 8080:8080 node:alpine npx -y coderaft
+```
+
+## Programmatic
 
 ```ts
 import { startCodeServer } from "coderaft";
