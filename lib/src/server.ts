@@ -97,12 +97,21 @@ export async function createCodeServer(
   const { modulesDir } = await loadCode();
   const vsRootPath = join(modulesDir, "code-server", "lib", "vscode");
 
-  // Load VS Code server module
+  // Load VS Code server module — mute noisy internal logs during init
+  const _log = console.log;
+  console.log = (...args: unknown[]) => {
+    if (typeof args[0] === "string" && args[0].includes("[reconnection-grace-time]")) return;
+    // Suppress VS Code's empty startup banner (timestamp + newlines)
+    if (args.length === 2 && typeof args[1] === "string" && !args[1].trim()) return;
+    _log(...args);
+  };
   const mod = await import(join(vsRootPath, "out/server-main.js"));
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,
     ...(withoutToken ? {} : { "connection-token": connectionToken }),
+    // Default reconnection grace time (3 hours) to suppress VS Code warning
+    "reconnection-grace-time": "10800",
     // Suppress coder/code-server's custom "Getting Started" walkthrough
     // (the promo page linking to cdr.co). Gated by the
     // `isEnabledCoderGettingStarted` context key in the workbench; defaults
@@ -110,6 +119,7 @@ export async function createCodeServer(
     "disable-getting-started-override": true,
     ...opts.vscode,
   } satisfies VSCodeServerOptions);
+  console.log = _log;
 
   return {
     connectionToken,
