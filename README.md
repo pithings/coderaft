@@ -1,4 +1,8 @@
-# code-server-slim
+# coderaft
+
+[![npm version](https://img.shields.io/npm/v/coderaft?color=blue)](https://npmjs.com/package/coderaft)
+[![npm downloads](https://img.shields.io/npm/dm/coderaft)](https://npmjs.com/package/coderaft)
+[![install size](https://packagephobia.com/badge?p=coderaft)](https://packagephobia.com/result?p=coderaft)
 
 Run VS Code on any machine anywhere and access it in the browser.
 
@@ -13,17 +17,17 @@ A redistribution of [coder/code-server](https://github.com/coder/code-server) bu
 
 Compared to [`code-server`](https://www.npmjs.com/package/code-server) and [`openvscode-server`](https://github.com/gitpod-io/openvscode-server):
 
-|                             | **code-server-slim** | **code-server**                           | **openvscode-server**            | **VS Code (DMG)**                |
-| --------------------------- | -------------------- | ----------------------------------------- | -------------------------------- | -------------------------------- |
-| Distribution                | **npm**              | npm                                       | GitHub tarball (not on npm)      | Platform installer (DMG/EXE/deb) |
-| Network download            | **31 MB**            | 273 MB                                    | ~73 MB                           | 155 MB                           |
-| Install size on disk\*      | **32 MB**            | 776 MB                                    | 224 MB                           | 529 MB                           |
-| Install time                | **~0.5s**            | ~15s                                      | ~1.2s                            | N/A                              |
-| Dependencies                | **0**                | 462                                       | Bundled                          | Bundled                          |
-| Build tools required        | **No**               | Yes (`node-gyp`, `gcc`, `make`, `python`) | No (pre-built)                   | No (pre-built)                   |
-| Post-install scripts        | **None**             | Yes (`--unsafe-perm` required as root)    | N/A                              | N/A                              |
-| Works on `node:slim` images | **Yes**              | No                                        | N/A (bundles own Node.js)        | N/A (desktop app)                |
-| Fully portable              | **Yes**              | No (platform-specific compiled binaries)  | No (Linux only, x64/arm64/armhf) | No (platform-specific)           |
+|                             | **coderaft** | **code-server**                           | **openvscode-server**            | **VS Code (DMG)**                |
+| --------------------------- | ------------ | ----------------------------------------- | -------------------------------- | -------------------------------- |
+| Distribution                | **npm**      | npm                                       | GitHub tarball (not on npm)      | Platform installer (DMG/EXE/deb) |
+| Network download            | **31 MB**    | 273 MB                                    | ~73 MB                           | 155 MB                           |
+| Install size on disk\*      | **32 MB**    | 776 MB                                    | 224 MB                           | 529 MB                           |
+| Install time                | **~0.5s**    | ~15s                                      | ~1.2s                            | N/A                              |
+| Dependencies                | **0**        | 462                                       | Bundled                          | Bundled                          |
+| Build tools required        | **No**       | Yes (`node-gyp`, `gcc`, `make`, `python`) | No (pre-built)                   | No (pre-built)                   |
+| Post-install scripts        | **None**     | Yes (`--unsafe-perm` required as root)    | N/A                              | N/A                              |
+| Works on `node:slim` images | **Yes**      | No                                        | N/A (bundles own Node.js)        | N/A (desktop app)                |
+| Fully portable              | **Yes**      | No (platform-specific compiled binaries)  | No (Linux only, x64/arm64/armhf) | No (platform-specific)           |
 
 > Measured with `npm i` inside a fresh `node:22` Docker container.
 >
@@ -36,7 +40,7 @@ Compared to [`code-server`](https://www.npmjs.com/package/code-server) and [`ope
 Start a server on the default port (`$PORT` or `8080`):
 
 ```sh
-npx code-server-slim@latest -o .
+npx coderaft@latest -o .
 ```
 
 ## Programmatic Usage
@@ -44,7 +48,7 @@ npx code-server-slim@latest -o .
 ### Quick Start
 
 ```ts
-import { startCodeServer } from "code-server-slim";
+import { startCodeServer } from "coderaft";
 
 const handle = await startCodeServer({
   port: 8080,
@@ -65,7 +69,7 @@ Use `createCodeServer` to get a request handler without starting a listener. Thi
 
 ```ts
 import { createServer } from "node:http";
-import { createCodeServer } from "code-server-slim";
+import { createCodeServer } from "coderaft";
 
 const handler = await createCodeServer({
   defaultFolder: "/path/to/workspace",

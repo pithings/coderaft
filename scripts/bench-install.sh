@@ -1,5 +1,5 @@
 #!/bin/bash
-# Benchmark install size and time for code-server-slim, code-server, and openvscode-server.
+# Benchmark install size and time for coderaft, code-server, and openvscode-server.
 # Runs inside a fresh Docker container for reproducible results.
 set -euo pipefail
 
@@ -14,10 +14,10 @@ set -euo pipefail
 
 fmt() { numfmt --to=iec-i --suffix=B "$1" 2>/dev/null || echo "$1 bytes"; }
 
-echo "--- code-server-slim ---"
+echo "--- coderaft ---"
 cd /tmp && mkdir slim && cd slim
 START=$(date +%s%N)
-npm i --loglevel=error code-server-slim 2>&1 | tail -1
+npm i --loglevel=error coderaft 2>&1 | tail -1
 END=$(date +%s%N)
 MS=$(( (END - START) / 1000000 ))
 SIZE=$(du -sb node_modules/ | cut -f1)

@@ -1,9 +1,9 @@
 {
-  "name": "code-server-slim",
+  "name": "coderaft",
   "version": "0.0.4",
+  "repository": "pithings/coderaft",
   "bin": {
-    "code-server": "./dist/cli.mjs",
-    "code-server-slim": "./dist/cli.mjs"
+    "coderaft": "./dist/cli.mjs"
   },
   "files": [
     "dist",

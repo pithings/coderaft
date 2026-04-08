@@ -21,7 +21,7 @@ This directory contains workspace packages that replace native/heavy dependencie
 - [`1ds-core-js/`](./1ds-core-js/) — No-op shim for [`@microsoft/1ds-core-js`](https://www.npmjs.com/package/@microsoft/1ds-core-js) (Microsoft 1DS telemetry core). Silently drops all telemetry events. Also eliminates transitive deps: `@microsoft/applicationinsights-core-js`, `@microsoft/dynamicproto-js`, `@microsoft/applicationinsights-shims`.
 - [`1ds-post-js/`](./1ds-post-js/) — No-op shim for [`@microsoft/1ds-post-js`](https://www.npmjs.com/package/@microsoft/1ds-post-js) (Microsoft 1DS telemetry transport). Silently drops all telemetry posts.
 
-Additionally, `code-server-slim` uses a minimal Node.js `http` server instead of the Express-based stack from upstream `coder/code-server` (dropping `express`, `compression`, `cookie-parser`, `http-proxy`, `httpolyglot`, `qs`, and friends), cutting startup time and dependency weight.
+Additionally, `coderaft` uses a minimal Node.js `http` server instead of the Express-based stack from upstream `coder/code-server` (dropping `express`, `compression`, `cookie-parser`, `http-proxy`, `httpolyglot`, `qs`, and friends), cutting startup time and dependency weight.
 
 ## pnpm Overrides
 
