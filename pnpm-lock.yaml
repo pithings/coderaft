@@ -180,8 +180,8 @@ importers:
   shims/node-pty:
     dependencies:
       zigpty:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
 
   shims/parcel-watcher: {}
 
@@ -2293,8 +2293,8 @@ packages:
   yazl@2.5.1:
     resolution: {integrity: sha512-phENi2PLiHnHb6QBVot+dJnaAZ0xosj7p3fWl+znIjBDlnMI2PsZCJZ306BPTFOaHf5qdDEI8x5qFrSOBN5vrw==}
 
-  zigpty@0.1.0:
-    resolution: {integrity: sha512-qS42OfL71Ya66qwf3Z/HvgC9eDtdCZwPTS6m4/wMXFnfQoGWOuTtTdaTwK5bE02oL7n/c7iJP9ux7famHJHMww==}
+  zigpty@0.1.1:
+    resolution: {integrity: sha512-rtiutBJwLlHK7Myn6ou7X80ZqmvEor0NOb2bQd49stm4bqgrApV6b+ED//aFO//pmNVquky18I41zm2jKq9hZg==}
 
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
@@ -4143,6 +4143,6 @@ snapshots:
     dependencies:
       buffer-crc32: 0.2.13
 
-  zigpty@0.1.0: {}
+  zigpty@0.1.1: {}
 
   zod@3.25.76: {}

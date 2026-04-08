@@ -9,6 +9,19 @@ import { serveStatic } from "./static.ts";
 import type { VSCodeServerOptions } from "./types.ts";
 import { loadCode } from "#code";
 
+// Android/Termux reports process.platform as "android" which VS Code's bundled
+// platform switches don't handle (only "win32", "darwin", "linux"). Remap it to
+// "linux" early so all downstream code (ptyHost, agentHost, server-main) works.
+// We also inject it via NODE_OPTIONS so forked child processes (ptyHost,
+// agentHost, file watcher) inherit the fix automatically.
+if (process.platform === "android") {
+  Object.defineProperty(process, "platform", { value: "linux" });
+  const preload = `--import "data:text/javascript,Object.defineProperty(process,'platform',{value:'linux'})"`;
+  process.env.NODE_OPTIONS = process.env.NODE_OPTIONS
+    ? `${process.env.NODE_OPTIONS} ${preload}`
+    : preload;
+}
+
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
 const MANIFEST_BODY = JSON.stringify({
