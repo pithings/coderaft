@@ -15,6 +15,7 @@ const { values, positionals } = parseArgs({
     "print-startup-performance": { type: "boolean" },
 
     // Auth
+    token: { type: "string", short: "t" },
     "connection-token": { type: "string" },
     "connection-token-file": { type: "string" },
     "without-connection-token": { type: "boolean" },
@@ -104,6 +105,7 @@ if (values.help) {
         --print-startup-performance      Print startup timing to stdout
 
   Auth:
+    -t, --token <token>                  Connection token for auth (shorthand)
         --connection-token <token>       Connection token for auth (auto-generated)
         --connection-token-file <path>   Path to file containing connection token
         --without-connection-token       Disable connection token auth
@@ -247,7 +249,7 @@ const handle = await startCodeServer({
   port: values.port ? Number(values.port) : undefined,
   host: values.host,
   defaultFolder: dir || values["default-folder"],
-  connectionToken: values["connection-token"],
+  connectionToken: values["connection-token"] ?? values.token,
   vscode,
 });
 

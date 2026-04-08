@@ -57,7 +57,7 @@ const instance = await startCodeServer({
   port: 6063,
   host: "127.0.0.1",
   defaultFolder: "/path/to/workspace",
-  // connectionToken: "my-secret", // auto-generated if omitted
+  // connectionToken: "my-secret", // disabled for localhost, auto-generated otherwise
 });
 
 console.log(`Ready at ${instance.url}`);
@@ -93,11 +93,12 @@ server.listen(3000);
 
 Creates a code-server handler without binding to a port.
 
-| Option            | Type                  | Description                                                     |
-| ----------------- | --------------------- | --------------------------------------------------------------- |
-| `defaultFolder`   | `string`              | Workspace folder opened when no input is given in the URL.      |
-| `connectionToken` | `string`              | Shared auth secret. Auto-generated if omitted.                  |
-| `vscode`          | `VSCodeServerOptions` | Extra options forwarded to VS Code's internal `createServer()`. |
+| Option            | Type                  | Description                                                                  |
+| ----------------- | --------------------- | ---------------------------------------------------------------------------- |
+| `defaultFolder`   | `string`              | Workspace folder opened when no input is given in the URL.                   |
+| `connectionToken` | `string`              | Shared auth secret. Disabled for localhost, auto-generated for remote hosts. |
+| `host`            | `string`              | Host/interface to bind. Used to infer whether to require a token.            |
+| `vscode`          | `VSCodeServerOptions` | Extra options forwarded to VS Code's internal `createServer()`.              |
 
 Returns a `CodeServerHandler`:
 
@@ -116,10 +117,9 @@ Convenience wrapper around `createCodeServer` that creates an HTTP server and st
 
 Accepts all `createCodeServer` options plus:
 
-| Option | Type     | Description                                                          |
-| ------ | -------- | -------------------------------------------------------------------- |
-| `port` | `number` | TCP port to listen on. Defaults to `$PORT` or `6063`.                |
-| `host` | `string` | Host/interface to bind. Defaults to Node's default (all interfaces). |
+| Option | Type     | Description                                           |
+| ------ | -------- | ----------------------------------------------------- |
+| `port` | `number` | TCP port to listen on. Defaults to `$PORT` or `6063`. |
 
 Returns a `CodeServerHandle`:
 
@@ -147,8 +147,12 @@ interface CodeServerHandle {
 
 ### Auth
 
+> [!NOTE]
+> When binding to `localhost` / `127.0.0.1` (or no `--host`), the connection token is **disabled by default** for convenience. When binding to any other host, a token is auto-generated unless `--without-connection-token` is explicitly passed. You can always override by providing `--token` or `--connection-token`.
+
 | Option                           | Description                                           |
 | -------------------------------- | ----------------------------------------------------- |
+| `-t, --token <token>`            | Connection token for auth (shorthand)                 |
 | `--connection-token <token>`     | Connection token for auth (auto-generated if omitted) |
 | `--connection-token-file <path>` | Path to file containing the connection token          |
 | `--without-connection-token`     | Disable connection token auth                         |

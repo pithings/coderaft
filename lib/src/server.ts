@@ -54,6 +54,8 @@ export interface CreateCodeServerOptions {
   defaultFolder?: string;
   /** Connection token (shared auth secret). Auto-generated if omitted. */
   connectionToken?: string;
+  /** Host/interface to bind (used to infer local-only access for token default). */
+  host?: string;
   /** Extra options forwarded to VS Code's `createServer()`. */
   vscode?: VSCodeServerOptions;
 }
@@ -61,8 +63,6 @@ export interface CreateCodeServerOptions {
 export interface StartCodeServerOptions extends CreateCodeServerOptions {
   /** TCP port to listen on. Defaults to `$PORT` or `6063`. */
   port?: number;
-  /** Host/interface to bind. Defaults to Node's default (all interfaces). */
-  host?: string;
 }
 
 export interface CodeServerHandler {
@@ -85,7 +85,13 @@ export interface CodeServerHandle {
 export async function createCodeServer(
   opts: CreateCodeServerOptions = {},
 ): Promise<CodeServerHandler> {
-  const withoutToken = opts.vscode?.["without-connection-token"] === true;
+  // Default to no connection token for local access (localhost/127.0.0.1 or no
+  // host specified). When an explicit host is given that isn't local, require a
+  // token unless `--without-connection-token` is explicitly passed.
+  const explicitToken = opts.connectionToken || opts.vscode?.["connection-token"];
+  const isLocal = !opts.host || /^(localhost|127\.0\.0\.1)$/.test(opts.host);
+  const withoutToken =
+    opts.vscode?.["without-connection-token"] === true || (!explicitToken && isLocal);
   const connectionToken = withoutToken ? "" : (opts.connectionToken ?? randomUUID());
   const defaultFolder = opts.defaultFolder ?? process.cwd();
 
