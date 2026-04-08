@@ -2,7 +2,8 @@
   "name": "code-server-slim",
   "version": "0.0.4",
   "bin": {
-    "code-server": "./dist/cli.mjs"
+    "code-server": "./dist/cli.mjs",
+    "code-server-slim": "./dist/cli.mjs"
   },
   "files": [
     "dist",
