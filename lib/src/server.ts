@@ -11,8 +11,8 @@ import { loadCode } from "#code";
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
 const MANIFEST_BODY = JSON.stringify({
-  name: "code-server",
-  short_name: "code-server",
+  name: "coderaft",
+  short_name: "coderaft",
   start_url: ".",
   display: "fullscreen",
   display_override: ["window-controls-overlay"],
@@ -106,6 +106,15 @@ export async function createCodeServer(
     _log(...args);
   };
   const mod = await import(join(vsRootPath, "out/server-main.js"));
+  // Override product branding from upstream "code-server" to "coderaft"
+  const _product = (globalThis as Record<string, unknown>)._VSCODE_PRODUCT_JSON as
+    | Record<string, unknown>
+    | undefined;
+  if (_product) {
+    _product.nameShort = "coderaft";
+    _product.nameLong = "coderaft";
+    _product.applicationName = "coderaft";
+  }
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,

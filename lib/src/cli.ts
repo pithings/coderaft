@@ -92,7 +92,7 @@ const { values, positionals } = parseArgs({
 
 if (values.help) {
   console.log(`
-  Usage: code-server [options]
+  Usage: coderaft [options]
 
   Server:
     -p, --port <port>                    Port to listen on (default: $PORT or 8080)

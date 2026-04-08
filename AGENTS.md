@@ -1,4 +1,4 @@
-# code-server
+# coderaft
 
 Custom VS Code server build with bundled dependencies.
 
