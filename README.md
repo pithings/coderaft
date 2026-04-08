@@ -243,6 +243,14 @@ interface CodeServerHandle {
 | `--crash-reporter-directory <dir>` | Crash reporter directory            |
 | `--crash-reporter-id <id>`         | Crash reporter ID                   |
 
+## Sponsors
+
+<p align="center">
+  <a href="https://sponsors.pi0.io/">
+    <img src="https://sponsors.pi0.io/sponsors.svg?xyz">
+  </a>
+</p>
+
 ## License
 
 MIT, with bundled third-party packages. See [lib/LICENSE.md](./lib/LICENSE.md).
