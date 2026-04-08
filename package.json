@@ -1,5 +1,9 @@
 {
   "private": true,
+  "workspaces": [
+    "lib",
+    "shims/*"
+  ],
   "type": "module",
   "scripts": {
     "build": "cd lib && pnpm build",
@@ -22,25 +26,23 @@
     "oxlint": "^1.59.0",
     "vitest": "^4.1.3"
   },
-  "packageManager": "pnpm@10.33.0",
-  "pnpm": {
-    "overrides": {
-      "@github/copilot": "workspace:*",
-      "@github/copilot-sdk": "workspace:*",
-      "vsda": "workspace:*",
-      "@vscode/fs-copyfile": "workspace:*",
-      "@vscode/native-watchdog": "workspace:*",
-      "@vscode/spdlog": "workspace:*",
-      "node-pty": "workspace:node-pty2@*",
-      "@vscode/ripgrep": "workspace:*",
-      "@vscode/deviceid": "workspace:*",
-      "@parcel/watcher": "workspace:*",
-      "fsevents": "workspace:*",
-      "@vscode/windows-process-tree": "workspace:*",
-      "argon2": "workspace:*",
-      "@vscode/proxy-agent": "workspace:*",
-      "@microsoft/1ds-core-js": "workspace:*",
-      "@microsoft/1ds-post-js": "workspace:*"
-    }
-  }
+  "overrides": {
+    "@github/copilot": "workspace:*",
+    "@github/copilot-sdk": "workspace:*",
+    "@microsoft/1ds-core-js": "workspace:*",
+    "@microsoft/1ds-post-js": "workspace:*",
+    "@parcel/watcher": "workspace:*",
+    "@vscode/deviceid": "workspace:*",
+    "@vscode/fs-copyfile": "workspace:*",
+    "@vscode/native-watchdog": "workspace:*",
+    "@vscode/proxy-agent": "workspace:*",
+    "@vscode/ripgrep": "workspace:*",
+    "@vscode/spdlog": "workspace:*",
+    "@vscode/windows-process-tree": "workspace:*",
+    "argon2": "workspace:*",
+    "fsevents": "workspace:*",
+    "node-pty": "workspace:node-pty2@*",
+    "vsda": "workspace:*"
+  },
+  "packageManager": "pnpm@10.33.0"
 }
