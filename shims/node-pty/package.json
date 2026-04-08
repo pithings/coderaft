@@ -5,6 +5,6 @@
   "type": "module",
   "main": "./src/index.js",
   "dependencies": {
-    "zigpty": "^0.0.4"
+    "zigpty": "^0.0.6"
   }
 }
