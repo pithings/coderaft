@@ -1,7 +1,6 @@
-# coderaft
+# 🛶 coderaft
 
-[![npm version](https://img.shields.io/npm/v/coderaft?color=blue)](https://npmjs.com/package/coderaft)
-[![npm downloads](https://img.shields.io/npm/dm/coderaft)](https://npmjs.com/package/coderaft)
+[![npm version](https://img.shields.io/npm/v/coderaft?color=blue)](https://npmx.dev/package/coderaft)
 [![install size](https://packagephobia.com/badge?p=coderaft)](https://packagephobia.com/result?p=coderaft)
 
 Run VS Code on any machine anywhere and access it in the browser.
@@ -37,33 +36,31 @@ Compared to [`code-server`](https://www.npmjs.com/package/code-server) and [`ope
 
 ## CLI Usage
 
-Start a server on the default port (`$PORT` or `8080`):
+Start a an instance:
 
 ```sh
-npx coderaft@latest -o .
+npx coderaft -o .
 ```
 
 ## Programmatic Usage
 
-### Quick Start
-
 ```ts
 import { startCodeServer } from "coderaft";
 
-const handle = await startCodeServer({
+const instance = await startCodeServer({
   port: 8080,
   host: "127.0.0.1",
   defaultFolder: "/path/to/workspace",
   // connectionToken: "my-secret", // auto-generated if omitted
 });
 
-console.log(`Ready at ${handle.url}`);
+console.log(`Ready at ${instance.url}`);
 
 // Later:
-await handle.close();
+await instance.close();
 ```
 
-### Middleware Usage
+### Middleware
 
 Use `createCodeServer` to get a request handler without starting a listener. This lets you integrate code-server into any existing Node.js HTTP server or framework:
 
