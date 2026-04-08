@@ -1,8 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { homedir } from "node:os";
-import os from "node:os";
 import { join } from "node:path";
 import type { Duplex } from "node:stream";
 import { serveStatic } from "./static.ts";
@@ -21,6 +19,16 @@ if (process.platform === "android") {
     ? `${process.env.NODE_OPTIONS} ${preload}`
     : preload;
 }
+
+// Access `os` via CJS require — NOT via a top-level ESM import. When Node sees
+// `import … from "node:os"` it creates an ESM wrapper whose named-export
+// bindings point directly at the original native functions and are immutable.
+// VS Code's bundled server-main.js uses `import { networkInterfaces } from "os"`
+// which resolves through that same wrapper. Patching the CJS exports object
+// *before* any ESM import of "os" exists ensures the ESM wrapper (created lazily
+// on first `import "os"`) picks up our patched function.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const _os: typeof import("node:os") = require("node:os");
 
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
@@ -109,7 +117,7 @@ export async function createCodeServer(
   process.env.CODE_SERVER_PARENT_PID ??= String(process.pid);
 
   const userDataDir =
-    opts.vscode?.["user-data-dir"] ?? join(homedir(), ".vscode-server-oss", "data");
+    opts.vscode?.["user-data-dir"] ?? join(_os.homedir(), ".vscode-server-oss", "data");
 
   // Remove stale workspace storage lock files left behind by ungraceful exits
   cleanupStaleLocks(userDataDir);
@@ -314,10 +322,10 @@ export async function startCodeServer(
 }
 
 function ensureNetworkInterface(): void {
-  const original = os.networkInterfaces;
+  const original = _os.networkInterfaces;
   const BLACKLISTED = new Set(["00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff", "ac:de:48:00:11:22"]);
-  const patched = function networkInterfaces() {
-    const ifaces = original.call(os);
+  _os.networkInterfaces = function networkInterfaces() {
+    const ifaces = original.call(_os);
     for (const name in ifaces) {
       for (const info of ifaces[name]!) {
         if (info.mac && !BLACKLISTED.has(info.mac)) return ifaces;
@@ -325,7 +333,7 @@ function ensureNetworkInterface(): void {
     }
     // No valid MAC found — inject a deterministic one derived from hostname
     const { createHash } = require("node:crypto") as typeof import("node:crypto");
-    const hash = createHash("md5").update(os.hostname()).digest();
+    const hash = createHash("md5").update(_os.hostname()).digest();
     // Format as a locally-administered unicast MAC (set bit 1 of first octet)
     hash[0] = (hash[0]! | 0x02) & 0xfe;
     const mac = [...hash.subarray(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join(":");
@@ -340,8 +348,7 @@ function ensureNetworkInterface(): void {
       },
     ];
     return ifaces;
-  } as typeof os.networkInterfaces;
-  os.networkInterfaces = patched;
+  } as typeof _os.networkInterfaces;
 }
 
 function cleanupStaleLocks(userDataDir: string): void {
