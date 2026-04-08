@@ -41,7 +41,7 @@
     "@vscode/windows-process-tree": "workspace:*",
     "argon2": "workspace:*",
     "fsevents": "workspace:*",
-    "node-pty": "workspace:node-pty2@*",
+    "node-pty": "workspace:*",
     "vsda": "workspace:*"
   },
   "packageManager": "pnpm@10.33.0"

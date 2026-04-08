@@ -1,5 +1,5 @@
 {
-  "name": "node-pty2",
+  "name": "node-pty",
   "version": "1.2.0",
   "private": true,
   "type": "module",

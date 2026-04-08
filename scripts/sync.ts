@@ -16,7 +16,7 @@ const extensionsPkg = JSON.parse(
 // in any upstream package.json (e.g. the git extension bundles a require
 // for `@vscode/fs-copyfile` without listing it as a dependency).
 const extraDeps: Record<string, string> = {
-  "@vscode/fs-copyfile": "^2.0.0",
+  "@vscode/fs-copyfile": "workspace:*",
 };
 
 // Merge and sort all nested dependencies
@@ -33,19 +33,25 @@ const pkgPath = join(workspacePkgDir, "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 const prevDeps = pkg.devDependencies || {};
 
-// Replace all devDependencies (keep code-server itself)
+// Replace all devDependencies (keep code-server and workspace:* refs)
 pkg.devDependencies = {
   "code-server": prevDeps["code-server"] || "^4.114.0",
   ...nestedDeps,
 };
+for (const [name, version] of Object.entries<string>(prevDeps)) {
+  if (version.startsWith("workspace:")) {
+    pkg.devDependencies[name] = version;
+  }
+}
 
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
-// Report changes
-const added = Object.keys(nestedDeps).filter((k) => !(k in prevDeps));
-const removed = Object.keys(prevDeps).filter((k) => k !== "code-server" && !(k in nestedDeps));
-const updated = Object.keys(nestedDeps).filter(
-  (k) => k in prevDeps && prevDeps[k] !== nestedDeps[k],
+// Report changes (compare against final state, not raw upstream)
+const finalDeps = pkg.devDependencies;
+const added = Object.keys(finalDeps).filter((k) => k !== "code-server" && !(k in prevDeps));
+const removed = Object.keys(prevDeps).filter((k) => k !== "code-server" && !(k in finalDeps));
+const updated = Object.keys(finalDeps).filter(
+  (k) => k !== "code-server" && k in prevDeps && prevDeps[k] !== finalDeps[k],
 );
 
 if (added.length) {
@@ -54,7 +60,7 @@ if (added.length) {
 }
 if (updated.length) {
   console.log(`Updated ${updated.length} dependencies:`);
-  for (const name of updated) console.log(`  ~ ${name}: ${prevDeps[name]} → ${nestedDeps[name]}`);
+  for (const name of updated) console.log(`  ~ ${name}: ${prevDeps[name]} → ${finalDeps[name]}`);
 }
 if (removed.length) {
   console.log(`Removed ${removed.length} dependencies:`);

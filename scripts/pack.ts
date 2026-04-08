@@ -91,11 +91,21 @@ if (hashChanged || !existsSync(outFile)) {
   execSync(`tar -C ${libDir} ${tarExcludes} -chf - node_modules | zstd -19 -T0 -f -o ${outFile}`, {
     stdio: "inherit",
   });
-  const sizeMB = (statSync(outFile).size / 1024 / 1024).toFixed(1);
+  const sizeBytes = statSync(outFile).size;
+  const sizeMB = (sizeBytes / 1024 / 1024).toFixed(1);
   console.log(`Packed to ${outFile} (${sizeMB} MB, hash: ${contentHash})`);
+  if (sizeBytes > 25 * 1024 * 1024) {
+    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds 25 MiB limit!`);
+    process.exit(1);
+  }
 } else {
-  const sizeMB = (statSync(outFile).size / 1024 / 1024).toFixed(1);
+  const sizeBytes = statSync(outFile).size;
+  const sizeMB = (sizeBytes / 1024 / 1024).toFixed(1);
   console.log(`Archive unchanged (${sizeMB} MB, hash: ${contentHash})`);
+  if (sizeBytes > 25 * 1024 * 1024) {
+    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds 25 MiB limit!`);
+    process.exit(1);
+  }
 }
 
 if (hashChanged) {
