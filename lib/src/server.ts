@@ -154,7 +154,9 @@ export async function createCodeServer(
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,
-    ...(withoutToken ? {} : { "connection-token": connectionToken }),
+    ...(withoutToken
+      ? { "without-connection-token": true }
+      : { "connection-token": connectionToken }),
     // Default reconnection grace time (3 hours) to suppress VS Code warning
     "reconnection-grace-time": "10800",
     // Suppress coder/code-server's custom "Getting Started" walkthrough
