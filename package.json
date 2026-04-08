@@ -12,7 +12,7 @@
     "link-deps": "node scripts/link.ts",
     "postinstall": "node scripts/link.ts",
     "fmt": "oxlint . --fix && oxfmt .",
-    "release": "cd lib && npm version patch --no-git-tag-version && git commit -am 'chore: release' && git tag -a v$(node -p \"require('./package.json').version\") -m 'release' && git push --follow-tags",
+    "release": "cd lib && pnpm changelogen --release",
     "lint": "oxlint . && oxfmt --check .",
     "prepack": "pnpm build",
     "test": "pnpm lint && pnpm typecheck",
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/node": "^25.5.2",
     "@typescript/native-preview": "^7.0.0-dev.20260408.1",
+    "changelogen": "^0.6.2",
     "obuild": "^0.4.33",
     "oxfmt": "^0.44.0",
     "oxlint": "^1.59.0",
