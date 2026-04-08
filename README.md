@@ -5,7 +5,7 @@
 
 Run VS Code on any machine anywhere and access it in the browser.
 
-A redistribution of [coder/code-server](https://github.com/coder/code-server) bundled into a single zero-dependency package (**~32 MB** vs 776 MB — **~25x smaller**). Native modules are shimmed with better alternatives ([zigpty](https://github.com/pithings/zigpty), [ripgrep-node](https://github.com/pithings/ripgrep-node), [...more](./shims/README.md)).
+A redistribution of [coder/code-server](https://github.com/coder/code-server) bundled into a single zero-dependency package (**~25 MB**). Native modules are shimmed with better alternatives ([zigpty](https://github.com/pithings/zigpty), [ripgrep-node](https://github.com/pithings/ripgrep-node), [...more](./shims/README.md)).
 
 - **Installs in under a second** — no build tools, post-install scripts, or C/C++ toolchain needed
 - **Fully portable** across platforms and architectures, unlike `code-server` (platform-specific binaries) and `openvscode-server` (Linux only)
