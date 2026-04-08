@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "build": "cd lib && pnpm build",
-    "dev": "CODE_MODULES_DIR=lib/node_modules node lib/src/cli.ts --without-connection-token",
+    "dev": "CODE_MODULES_DIR=lib/node_modules node lib/src/cli.ts",
     "start": "node lib/dist/cli.mjs",
     "link-deps": "node scripts/link.ts",
     "postinstall": "node scripts/link.ts",
