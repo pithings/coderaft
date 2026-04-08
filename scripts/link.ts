@@ -14,13 +14,13 @@ const shimsDir = join(rootDir, "shims");
 const extraDeps = ["vsda", "@vscode/fs-copyfile"];
 
 // Symlink code-server's ThirdPartyNotices.txt into the workspace package
-const notices = join(codeServerDir, "ThirdPartyNotices.txt");
-const noticesLink = join(workspacePkgDir, "ThirdPartyNotices.txt");
-if (existsSync(notices)) {
-  if (existsSync(noticesLink)) rmSync(noticesLink);
-  symlinkSync(realpathSync(notices), noticesLink);
-  console.log(`Linked ThirdPartyNotices.txt → ${notices}`);
-}
+// const notices = join(codeServerDir, "ThirdPartyNotices.txt");
+// const noticesLink = join(workspacePkgDir, "ThirdPartyNotices.txt");
+// if (existsSync(notices)) {
+//   if (existsSync(noticesLink)) rmSync(noticesLink);
+//   symlinkSync(realpathSync(notices), noticesLink);
+//   console.log(`Linked ThirdPartyNotices.txt → ${notices}`);
+// }
 
 // Link extra deps into workspace node_modules so tar -ch can resolve them
 for (const dep of extraDeps) {
