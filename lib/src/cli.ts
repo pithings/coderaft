@@ -95,7 +95,7 @@ if (values.help) {
   Usage: coderaft [options]
 
   Server:
-    -p, --port <port>                    Port to listen on (default: $PORT or 8080)
+    -p, --port <port>                    Port to listen on (default: $PORT or 6063)
     -H, --host <host>                    Host/interface to bind
         --server-base-path <path>        Base path for the web UI (default: /)
         --socket-path <path>             Path to a socket file to listen on
@@ -233,13 +233,12 @@ if (values["logs-path"]) {
 }
 
 const dir = positionals[0];
-const autoPort0 = !values.port && values.open && !process.env.PORT;
-if (autoPort0 || dir) {
+if (dir) {
   vscode["disable-workspace-trust"] = true;
 }
 
 const handle = await startCodeServer({
-  port: values.port ? Number(values.port) : autoPort0 ? 0 : undefined,
+  port: values.port ? Number(values.port) : undefined,
   host: values.host,
   defaultFolder: dir || values["default-folder"],
   connectionToken: values["connection-token"],

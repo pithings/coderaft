@@ -45,7 +45,7 @@ export interface CreateCodeServerOptions {
 }
 
 export interface StartCodeServerOptions extends CreateCodeServerOptions {
-  /** TCP port to listen on. Defaults to `$PORT` or `8080`. */
+  /** TCP port to listen on. Defaults to `$PORT` or `6063`. */
   port?: number;
   /** Host/interface to bind. Defaults to Node's default (all interfaces). */
   host?: string;
@@ -229,7 +229,7 @@ export async function createCodeServer(
 export async function startCodeServer(
   opts: StartCodeServerOptions = {},
 ): Promise<CodeServerHandle> {
-  const port = opts.port ?? (Number(process.env.PORT) || 8080);
+  const port = opts.port ?? (Number(process.env.PORT) || 6063);
   const handler = await createCodeServer(opts);
 
   const server = createServer((req, res) => {

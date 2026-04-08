@@ -45,7 +45,7 @@ npx coderaft -o .
 ### Docker
 
 ```sh
-docker run -it --rm -p 8080:8080 node:alpine npx -y coderaft
+docker run -it --rm -p 6063:6063 node:alpine npx -y coderaft
 ```
 
 ## Programmatic
@@ -54,7 +54,7 @@ docker run -it --rm -p 8080:8080 node:alpine npx -y coderaft
 import { startCodeServer } from "coderaft";
 
 const instance = await startCodeServer({
-  port: 8080,
+  port: 6063,
   host: "127.0.0.1",
   defaultFolder: "/path/to/workspace",
   // connectionToken: "my-secret", // auto-generated if omitted
@@ -118,7 +118,7 @@ Accepts all `createCodeServer` options plus:
 
 | Option | Type     | Description                                                          |
 | ------ | -------- | -------------------------------------------------------------------- |
-| `port` | `number` | TCP port to listen on. Defaults to `$PORT` or `8080`.                |
+| `port` | `number` | TCP port to listen on. Defaults to `$PORT` or `6063`.                |
 | `host` | `string` | Host/interface to bind. Defaults to Node's default (all interfaces). |
 
 Returns a `CodeServerHandle`:
@@ -139,7 +139,7 @@ interface CodeServerHandle {
 
 | Option                        | Description                                    |
 | ----------------------------- | ---------------------------------------------- |
-| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `8080`) |
+| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `6063`) |
 | `-H, --host <host>`           | Host/interface to bind                         |
 | `--server-base-path <path>`   | Base path for the web UI (default: `/`)        |
 | `--socket-path <path>`        | Path to a socket file to listen on             |
