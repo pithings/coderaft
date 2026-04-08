@@ -35,7 +35,7 @@ const { values, positionals } = parseArgs({
     "agent-plugins-dir": { type: "string" },
 
     // Logging
-    log: { type: "string" },
+    log: { type: "string", multiple: true },
     "logs-path": { type: "string" },
 
     // Network
@@ -55,6 +55,8 @@ const { values, positionals } = parseArgs({
 
     // Features
     "enable-sync": { type: "boolean" },
+    "disable-extensions": { type: "boolean" },
+    "disable-extension": { type: "string", multiple: true },
     "enable-proposed-api": { type: "string", multiple: true },
     "disable-workspace-trust": { type: "boolean" },
     "disable-getting-started-override": { type: "boolean" },
@@ -142,6 +144,8 @@ if (values.help) {
 
   Features:
         --enable-sync                    Enable settings sync
+        --disable-extensions             Disable all installed extensions
+        --disable-extension <ext-id>     Disable specific extension (repeatable)
         --enable-proposed-api <ext-id>   Enable proposed API for extension (repeatable)
         --disable-workspace-trust        Disable workspace trust
         --disable-getting-started-override  Disable getting started override
@@ -204,6 +208,8 @@ const vsKeys = [
   "disable-update-check",
   "disable-experiments",
   "enable-sync",
+  "disable-extensions",
+  "disable-extension",
   "enable-proposed-api",
   "disable-workspace-trust",
   "disable-getting-started-override",

@@ -63,7 +63,7 @@ export interface VSCodeServerOptions {
 
   // --- Logging ---
 
-  log?: string;
+  log?: string[];
   logsPath?: string;
 
   // --- Network ---
