@@ -4,6 +4,6 @@
   "private": true,
   "main": "./src/index.js",
   "dependencies": {
-    "zigpty": "^0.1.2"
+    "zigpty": "^0.1.5"
   }
 }

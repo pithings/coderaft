@@ -29,8 +29,8 @@ REMOTE_PORT="${REMOTE_PORT:-$(shuf -i 10000-65000 -n 1)}"
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 REMOTE_DIR="coderaft"
 
-echo "=> Syncing lib/ to $SSH_HOST:~/$REMOTE_DIR/lib..."
-tar -C "$ROOT_DIR" --no-xattrs -cf - lib/ | ssh -p "$SSH_PORT" "$SSH_HOST" "mkdir -p ~/$REMOTE_DIR && tar -C ~/$REMOTE_DIR -xf -"
+echo "=> Syncing lib/ and shims/ to $SSH_HOST:~/$REMOTE_DIR/..."
+tar -C "$ROOT_DIR" --no-xattrs -h -cf - lib/ shims/ | ssh -p "$SSH_PORT" "$SSH_HOST" "mkdir -p ~/$REMOTE_DIR && tar -C ~/$REMOTE_DIR -xf -"
 
 echo "=> Starting server on remote port $REMOTE_PORT (forwarding to localhost:$PORT and localhost:$REMOTE_PORT)..."
 ssh -t -p "$SSH_PORT" -L "$PORT:localhost:$REMOTE_PORT" -L "$REMOTE_PORT:localhost:$REMOTE_PORT" "$SSH_HOST" \

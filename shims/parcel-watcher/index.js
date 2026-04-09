@@ -37,15 +37,23 @@ class AsyncSubscription {
  */
 async function subscribe(dir, fn, _opts) {
   const resolvedDir = path.resolve(dir);
-  const watcher = fs.watch(resolvedDir, { recursive: true }, (eventType, filename) => {
-    if (!filename) return;
-    const fullPath = path.join(resolvedDir, filename);
-    // fs.watch only gives "rename" or "change" — map to @parcel/watcher event types.
-    // "rename" fires for both creation and deletion; disambiguate with existsSync.
-    const type =
-      eventType === "rename" ? (fs.existsSync(fullPath) ? "create" : "delete") : "update";
-    fn(null, [{ path: fullPath, type }]);
-  });
+  let watcher;
+  try {
+    watcher = fs.watch(resolvedDir, { recursive: true }, (eventType, filename) => {
+      if (!filename) return;
+      const fullPath = path.join(resolvedDir, filename);
+      // fs.watch only gives "rename" or "change" — map to @parcel/watcher event types.
+      // "rename" fires for both creation and deletion; disambiguate with existsSync.
+      const type =
+        eventType === "rename" ? (fs.existsSync(fullPath) ? "create" : "delete") : "update";
+      fn(null, [{ path: fullPath, type }]);
+    });
+  } catch (err) {
+    // fs.watch throws synchronously on permission errors (EACCES) or missing dirs.
+    // Return a no-op subscription instead of crashing the caller.
+    fn(err, []);
+    return new AsyncSubscription({ close() {} });
+  }
   watcher.on("error", (err) => fn(err, []));
   return new AsyncSubscription(watcher);
 }

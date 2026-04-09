@@ -23,7 +23,12 @@ function wrapPty(pty) {
       return pty.rows;
     },
     get process() {
-      return pty.process;
+      try {
+        return pty.process;
+      } catch (err) {
+        console.error(`[node-pty] process getter error: pid=${pty.pid}`, err);
+        return "";
+      }
     },
     get handleFlowControl() {
       return pty.handleFlowControl;
@@ -37,13 +42,27 @@ function wrapPty(pty) {
     resize: (columns, rows, pixelSize) => pty.resize(columns, rows, pixelSize),
     clear: () => pty.clear(),
     write: (data) => pty.write(typeof data === "string" ? data : data.toString("utf8")),
-    kill: (signal) => pty.kill(signal),
+    kill: (signal) => {
+      console.error(`[node-pty] kill: pid=${pty.pid}, signal=${signal}`);
+      pty.kill(signal);
+    },
     pause: () => pty.pause(),
     resume: () => pty.resume(),
   };
 }
 
 function spawn(file, args, options) {
+  // console.error(
+  //   `[node-pty] spawn: file=${file}, args=${JSON.stringify(args)}, cwd=${options.cwd}, uid=${options.uid}, gid=${options.gid}`,
+  // );
+  // if (options.env) {
+  //   console.error(`[node-pty] env.PATH=${options.env.PATH}`);
+  //   console.error(`[node-pty] env.SHELL=${options.env.SHELL}`);
+  //   console.error(`[node-pty] env.HOME=${options.env.HOME}`);
+  //   console.error(`[node-pty] env.TERM=${options.env.TERM}`);
+  //   console.error(`[node-pty] env.LD_LIBRARY_PATH=${options.env.LD_LIBRARY_PATH}`);
+  //   console.error(`[node-pty] env.LD_PRELOAD=${options.env.LD_PRELOAD}`);
+  // }
   const zigOptions = {
     name: options.name,
     cols: options.cols,
@@ -62,7 +81,20 @@ function spawn(file, args, options) {
   }
 
   const normalizedArgs = typeof args === "string" ? args.split(" ") : args;
-  return wrapPty(zigSpawn(file, normalizedArgs, zigOptions));
+  try {
+    const t0 = Date.now();
+    const pty = zigSpawn(file, normalizedArgs, zigOptions);
+    console.error(`[node-pty] spawned pid=${pty.pid} in ${Date.now() - t0}ms`);
+    pty.onExit((e) =>
+      console.error(
+        `[node-pty] exit: pid=${pty.pid}, code=${e.exitCode}, signal=${e.signal}, alive=${Date.now() - t0}ms`,
+      ),
+    );
+    return wrapPty(pty);
+  } catch (err) {
+    console.error(`[node-pty] spawn error:`, err);
+    throw err;
+  }
 }
 
 /** @deprecated Use `spawn` instead. */
