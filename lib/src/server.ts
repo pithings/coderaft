@@ -4,6 +4,7 @@ import { readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { join } from "node:path";
 import type { Duplex } from "node:stream";
+import { createProxyServer } from "httpxy";
 import { serveStatic } from "./static.ts";
 import type { VSCodeServerOptions } from "./types.ts";
 import { loadCode } from "#code";
@@ -145,6 +146,14 @@ export async function createCodeServer(
   } satisfies VSCodeServerOptions);
   console.log = _log;
 
+  const proxy = createProxyServer({});
+  proxy.on("error", (err, req, res) => {
+    if (res && "writeHead" in res) {
+      (res as ServerResponse).writeHead(502, { "Content-Type": "text/plain" });
+      (res as ServerResponse).end(`Proxy error: ${err.message}`);
+    }
+  });
+
   return {
     connectionToken,
     handleRequest(req: IncomingMessage, res: ServerResponse) {
@@ -229,10 +238,39 @@ export async function createCodeServer(
         return;
       }
 
+      // Path-based proxy: /proxy/:port/* → http://127.0.0.1:{port}/*
+      const proxyMatch = parseProxyPath(req.url ?? "/");
+      if (proxyMatch) {
+        const { port: targetPort, path: targetPath } = proxyMatch;
+        proxy.web(req, res, {
+          target: `http://127.0.0.1:${targetPort}${targetPath}`,
+          ignorePath: true,
+          xfwd: true,
+        });
+        return;
+      }
+
       vscodeServer.handleRequest(req, res);
     },
     handleUpgrade(req: IncomingMessage, socket: Duplex, _head: Buffer) {
-      vscodeServer.handleUpgrade(req, socket);
+      // Path-based proxy: WebSocket upgrade
+      const proxyMatch = parseProxyPath(req.url ?? "/");
+      if (proxyMatch) {
+        const { port: targetPort, path: targetPath } = proxyMatch;
+        proxy.ws(
+          req,
+          socket as unknown as import("node:http").OutgoingMessage,
+          {
+            target: `http://127.0.0.1:${targetPort}${targetPath}`,
+            ignorePath: true,
+            xfwd: true,
+          },
+          _head,
+        );
+        return;
+      }
+
+      vscodeServer.handleUpgrade(req, socket, _head);
     },
     async dispose() {
       vscodeServer.dispose();
@@ -350,6 +388,22 @@ function watchChildProcessHealth(): NodeJS.Timeout | undefined {
   }, 5000);
   interval.unref();
   return interval;
+}
+
+// Matches /proxy/:port or /proxy/:port/rest/of/path?query
+// Returns { port, path } where path includes the query string.
+const PROXY_RE = /^\/proxy\/(\d+)(\/.*)?$/;
+
+function parseProxyPath(url: string): { port: number; path: string } | undefined {
+  const qIdx = url.indexOf("?");
+  const pathname = qIdx === -1 ? url : url.slice(0, qIdx);
+  const query = qIdx === -1 ? "" : url.slice(qIdx);
+  const match = PROXY_RE.exec(pathname);
+  if (!match) return;
+  const port = Number(match[1]);
+  if (port < 1 || port > 65535) return;
+  const path = (match[2] || "/") + query;
+  return { port, path };
 }
 
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
