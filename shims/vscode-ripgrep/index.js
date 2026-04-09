@@ -1,1 +1,3 @@
-export { rgPath } from "ripgrep";
+const { rgPath } = require("ripgrep");
+
+module.exports = { rgPath };

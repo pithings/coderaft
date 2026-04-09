@@ -2,7 +2,6 @@
   "name": "@vscode/ripgrep",
   "version": "1.17.1",
   "private": true,
-  "type": "module",
   "main": "./index.js",
   "dependencies": {
     "ripgrep": "^0.3.1"

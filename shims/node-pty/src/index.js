@@ -1,4 +1,4 @@
-import { spawn as zigSpawn, open as zigOpen } from "zigpty";
+const { spawn: zigSpawn, open: zigOpen } = require("zigpty");
 
 // Prevent SIGINT from killing the pty host child process.
 // The native node-pty runs in-process as a C++ addon and is immune to SIGINT,
@@ -43,7 +43,7 @@ function wrapPty(pty) {
   };
 }
 
-export function spawn(file, args, options) {
+function spawn(file, args, options) {
   const zigOptions = {
     name: options.name,
     cols: options.cols,
@@ -66,11 +66,13 @@ export function spawn(file, args, options) {
 }
 
 /** @deprecated Use `spawn` instead. */
-export const fork = spawn;
+const fork = spawn;
 
 /** @deprecated Use `spawn` instead. */
-export const createTerminal = spawn;
+const createTerminal = spawn;
 
-export function open(options) {
+function open(options) {
   return zigOpen(options);
 }
+
+module.exports = { spawn, fork, createTerminal, open };

@@ -1,7 +1,7 @@
 // Mock @github/copilot-sdk — no-op CopilotClient.
-// Satisfies VS Code's `import { CopilotClient } from "@github/copilot-sdk"`.
+// Satisfies VS Code's `require("@github/copilot-sdk")`.
 
-export class CopilotClient {
+class CopilotClient {
   constructor(_options) {
     this.state = "disconnected";
   }
@@ -42,7 +42,7 @@ export class CopilotClient {
   }
 }
 
-export class CopilotSession {
+class CopilotSession {
   constructor() {}
   on(_handler) {
     return { dispose() {} };
@@ -51,12 +51,20 @@ export class CopilotSession {
   async disconnect() {}
 }
 
-export function defineTool(_def) {
+function defineTool(_def) {
   return _def;
 }
 
-export function approveAll() {
+function approveAll() {
   return true;
 }
 
-export const SYSTEM_PROMPT_SECTIONS = {};
+const SYSTEM_PROMPT_SECTIONS = {};
+
+module.exports = {
+  CopilotClient,
+  CopilotSession,
+  defineTool,
+  approveAll,
+  SYSTEM_PROMPT_SECTIONS,
+};

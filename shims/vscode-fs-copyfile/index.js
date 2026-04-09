@@ -6,16 +6,18 @@
 // just re-exports the Node built-ins, so shimming it out loses nothing there
 // and only gives up the CoW fast-path on macOS (still correct, just slower).
 
-import { copyFile as nodeCopyFile, cp as nodeCp } from "node:fs/promises";
-import { copyFileSync as nodeCopyFileSync, constants as nodeConstants } from "node:fs";
+const { copyFile, cp } = require("node:fs/promises");
+const { copyFileSync, constants: nodeConstants } = require("node:fs");
 
-export const copyFile = nodeCopyFile;
-export const copyFileSync = nodeCopyFileSync;
-export const cp = nodeCp;
-export const isMacOS = process.platform === "darwin";
-export const isCloneSupported = (_path) => false;
-export const constants = {
-  COPYFILE_EXCL: nodeConstants.COPYFILE_EXCL,
-  COPYFILE_FICLONE: nodeConstants.COPYFILE_FICLONE,
-  COPYFILE_FICLONE_FORCE: nodeConstants.COPYFILE_FICLONE_FORCE,
+module.exports = {
+  copyFile,
+  copyFileSync,
+  cp,
+  isMacOS: process.platform === "darwin",
+  isCloneSupported: (_path) => false,
+  constants: {
+    COPYFILE_EXCL: nodeConstants.COPYFILE_EXCL,
+    COPYFILE_FICLONE: nodeConstants.COPYFILE_FICLONE,
+    COPYFILE_FICLONE_FORCE: nodeConstants.COPYFILE_FICLONE_FORCE,
+  },
 };

@@ -1,6 +1,6 @@
-import { randomUUID } from "node:crypto";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { join } from "node:path";
+const { randomUUID } = require("node:crypto");
+const { readFile, writeFile, mkdir } = require("node:fs/promises");
+const { join } = require("node:path");
 
 function getDirectory() {
   const home = process.env.HOME;
@@ -14,7 +14,7 @@ function getDirectory() {
   return join(cache, "Microsoft", "DeveloperTools");
 }
 
-export async function getDeviceId() {
+async function getDeviceId() {
   const filePath = join(getDirectory(), "deviceid");
   try {
     return await readFile(filePath, "utf8");
@@ -27,3 +27,5 @@ export async function getDeviceId() {
   await writeFile(filePath, deviceId, "utf8");
   return deviceId;
 }
+
+module.exports = { getDeviceId };
