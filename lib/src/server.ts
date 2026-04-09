@@ -28,7 +28,7 @@ if (process.platform === "android") {
 // *before* any ESM import of "os" exists ensures the ESM wrapper (created lazily
 // on first `import "os"`) picks up our patched function.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const _os: typeof import("node:os") = require("node:os");
+const _os: typeof import("node:os") = process.getBuiltinModule?.("os");
 
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
