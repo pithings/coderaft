@@ -1,14 +1,7 @@
-// Minimal @vscode/native-watchdog shim — drops the native C++ addon that
-// monitors a parent pid from a background thread and force-exits the
-// current process if the parent dies.
-//
-// VS Code's extension host uses this as a safety net against orphaned
-// ext-host processes when the main process crashes. It's a best-effort
-// cleanup feature, not a correctness requirement: under a supervisor
-// (systemd, docker, launchd) orphans get reaped anyway, and the IPC
-// channel close from the dying parent already triggers normal shutdown.
-//
-// The shim keeps the API surface (start/exit) but does nothing on start.
+// Pure-JS @vscode/native-watchdog — replaces the native C++ addon that monitors
+// a parent pid from a background thread and force-exits the current process if
+// the parent dies. This implementation polls with setInterval instead, avoiding
+// native threading issues (e.g. futex deadlocks on Node v25).
 
 let hasStarted = false;
 
@@ -20,6 +13,21 @@ exports.start = function (pid) {
     throw new Error("Can only monitor a single process!");
   }
   hasStarted = true;
+  // console.log(`[coderaft] Watchdog: monitoring parent pid ${pid} from pid ${process.pid}`);
+
+  const interval = setInterval(() => {
+    try {
+      process.kill(pid, 0); // Throws if pid doesn't exist
+    } catch {
+      console.log(
+        `[coderaft] Watchdog: parent pid ${pid} is gone, exiting pid ${process.pid} in 6s`,
+      );
+      clearInterval(interval);
+      setTimeout(() => process.exit(87), 6000).unref();
+      return;
+    }
+  }, 3000);
+  interval.unref();
 };
 
 exports.exit = function (code) {
