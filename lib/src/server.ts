@@ -77,7 +77,7 @@ export interface CodeServerHandler {
   /** Node-style HTTP request handler (middleware). */
   handleRequest(req: IncomingMessage, res: ServerResponse): void;
   /** Handle WebSocket upgrade. */
-  handleUpgrade(req: IncomingMessage, socket: Duplex): void;
+  handleUpgrade(req: IncomingMessage, socket: Duplex, head: Buffer): void;
   connectionToken: string;
   dispose(): Promise<void>;
 }
@@ -254,9 +254,8 @@ export async function createCodeServer(
 
       vscodeServer.handleRequest(req, res);
     },
-    handleUpgrade(req: IncomingMessage, socket: Duplex) {
+    handleUpgrade(req: IncomingMessage, socket: Duplex, _head: Buffer) {
       vscodeServer.handleUpgrade(req, socket);
-      socket.resume();
     },
     async dispose() {
       vscodeServer.dispose();
@@ -274,8 +273,8 @@ export async function startCodeServer(
     handler.handleRequest(req, res);
   });
 
-  server.on("upgrade", (req, socket) => {
-    handler.handleUpgrade(req, socket);
+  server.on("upgrade", (req, socket, head) => {
+    handler.handleUpgrade(req, socket, head);
   });
 
   const listen = (p: number) =>
