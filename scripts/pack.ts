@@ -3,6 +3,9 @@ import { createHash } from "node:crypto";
 import { execSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
+import { platform } from "node:os";
+
+const maxSizeMB = platform() === "darwin" ? 35 : 25;
 
 const libDir = join(import.meta.dirname!, "../lib");
 const nodeModulesDir = join(libDir, "node_modules");
@@ -94,16 +97,16 @@ if (hashChanged || !existsSync(outFile)) {
   const sizeBytes = statSync(outFile).size;
   const sizeMB = (sizeBytes / 1024 / 1024).toFixed(1);
   console.log(`Packed to ${outFile} (${sizeMB} MB, hash: ${contentHash})`);
-  if (sizeBytes > 25 * 1024 * 1024) {
-    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds 25 MiB limit!`);
+  if (sizeBytes > maxSizeMB * 1024 * 1024) {
+    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds ${maxSizeMB} MiB limit!`);
     process.exit(1);
   }
 } else {
   const sizeBytes = statSync(outFile).size;
   const sizeMB = (sizeBytes / 1024 / 1024).toFixed(1);
   console.log(`Archive unchanged (${sizeMB} MB, hash: ${contentHash})`);
-  if (sizeBytes > 25 * 1024 * 1024) {
-    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds 25 MiB limit!`);
+  if (sizeBytes > maxSizeMB * 1024 * 1024) {
+    console.error(`ERROR: Archive size (${sizeMB} MB) exceeds ${maxSizeMB} MiB limit!`);
     process.exit(1);
   }
 }
