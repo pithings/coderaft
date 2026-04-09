@@ -8,6 +8,26 @@ if (process.platform === "android") {
     ? `${process.env.NODE_OPTIONS} ${preload}`
     : preload;
 
+  // Filter PATH to remove directories that are inaccessible on Android/Termux.
+  // VS Code's node.js file watcher tries to watch every PATH dir for executable
+  // changes. System dirs like /system/bin, /vendor/bin are read-only and produce
+  // noisy EACCES errors. They never change at runtime so safe to exclude.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const _fs: typeof import("node:fs") = process.getBuiltinModule?.("fs") ?? require("node:fs");
+  if (process.env.PATH) {
+    const accessible = process.env.PATH.split(":").filter((dir) => {
+      try {
+        _fs.accessSync(dir, _fs.constants.R_OK);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    if (accessible.length > 0) {
+      process.env.PATH = accessible.join(":");
+    }
+  }
+
   // Ensure `os.networkInterfaces()` always returns at least one interface with a
   // valid MAC. On Termux/Android no real NICs are exposed, causing VS Code's
   // `getMacAddress()` to throw "Unable to retrieve mac address (unexpected format)".
