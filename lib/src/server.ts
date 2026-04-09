@@ -259,7 +259,7 @@ export async function createCodeServer(
         const { port: targetPort, path: targetPath } = proxyMatch;
         proxy.ws(
           req,
-          socket as unknown as import("node:http").OutgoingMessage,
+          socket as import("node:net").Socket,
           {
             target: `http://127.0.0.1:${targetPort}${targetPath}`,
             ignorePath: true,
