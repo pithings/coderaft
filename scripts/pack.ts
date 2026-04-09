@@ -25,7 +25,6 @@ const excludeNames = new Set(["README.md", "LICENSE", "LICENSE.md", "LICENSE.txt
 const tarExcludes = [
   "node_modules/.bin",
   "node_modules/katex/src",
-  "*.d.ts",
   "*.map",
   "README.md",
   "LICENSE",
@@ -35,13 +34,24 @@ const tarExcludes = [
   .map((p) => `--exclude='${p}'`)
   .join(" ");
 
+// TypeScript's lib.*.d.ts files are required by tsserver for IntelliSense.
+const keepDts = new Set(["typescript/lib"]);
+
 // Hash node_modules content deterministically (independent of tar metadata)
 console.log("Hashing lib/node_modules...");
 
-function shouldExclude(name: string): boolean {
+function shouldExclude(name: string, relPath: string): boolean {
   if (excludeNames.has(name)) return true;
   for (const ext of excludeExts) {
-    if (name.endsWith(ext)) return true;
+    if (name.endsWith(ext)) {
+      // Keep .d.ts files required by tsserver for IntelliSense
+      if (ext === ".d.ts") {
+        for (const keep of keepDts) {
+          if (relPath.includes(keep)) return false;
+        }
+      }
+      return true;
+    }
   }
   return false;
 }
@@ -58,8 +68,9 @@ function collectFiles(dir: string, files: string[] = []): string[] {
       if (excludeDirPaths.has(relative(nodeModulesDir, fullPath))) continue;
       collectFiles(fullPath, files);
     } else if (entry.isFile() || isSymlink) {
-      if (shouldExclude(entry.name)) continue;
-      files.push(relative(nodeModulesDir, fullPath));
+      const relPath = relative(nodeModulesDir, fullPath);
+      if (shouldExclude(entry.name, relPath)) continue;
+      files.push(relPath);
     }
   }
   return files;
