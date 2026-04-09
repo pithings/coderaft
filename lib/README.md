@@ -45,8 +45,10 @@ npx coderaft -o .
 ### Docker
 
 ```sh
-docker run -it --rm -p 6063:6063 node:lts-slim npx -y coderaft
+docker run -it --rm -p 6063:6063 -v coderaft:/data ghcr.io/pithings/coderaft
 ```
+
+Based on Alpine with Node.js LTS, bash, corepack (npm/pnpm/yarn) (~65 MB download, ~89 MB final). Data persists in `/data` volume (`/data/workspace` for project files, `/data/home` symlinked to `/root` for configs).
 
 ## Programmatic
 
