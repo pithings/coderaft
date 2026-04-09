@@ -158,11 +158,7 @@ function extractApiExports(source: string): string[] {
       }
     }
     const block = source.substring(start, end);
-    if (
-      block.includes("commands") &&
-      block.includes("window") &&
-      block.includes("workspace")
-    ) {
+    if (block.includes("commands") && block.includes("window") && block.includes("workspace")) {
       const inner = block.substring(block.indexOf("{") + 1, block.lastIndexOf("}"));
       const keys: string[] = [];
       const keyRe = /(\w+)\s*:/g;
