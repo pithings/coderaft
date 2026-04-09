@@ -157,8 +157,10 @@ export async function createCodeServer(
     ...(withoutToken
       ? { "without-connection-token": true }
       : { "connection-token": connectionToken }),
-    // Default reconnection grace time (3 hours) to suppress VS Code warning
-    "reconnection-grace-time": "10800",
+    // Grace time for reconnecting after a disconnect. Keep it short so that
+    // stale extension hosts (and their workspace locks) are cleaned up quickly
+    // when a browser tab is hard-refreshed (new connection ID).
+    "reconnection-grace-time": "30",
     // Suppress coder/code-server's custom "Getting Started" walkthrough
     // (the promo page linking to cdr.co). Gated by the
     // `isEnabledCoderGettingStarted` context key in the workbench; defaults
@@ -359,6 +361,7 @@ function cleanupStaleLocks(userDataDir: string): void {
       const lockPath = join(storageDir, entry, "vscode.lock");
       try {
         unlinkSync(lockPath);
+        console.log(`[coderaft] Removed stale lock: ${lockPath}`);
       } catch {
         // Lock file doesn't exist — nothing to clean
       }
