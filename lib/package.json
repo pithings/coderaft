@@ -11,11 +11,13 @@
     "ThirdPartyNotices.txt",
     "tar.mjs",
     "code.mjs",
+    "android-preload.cjs",
     "code.tar.zst"
   ],
   "type": "module",
   "imports": {
-    "#code": "./code.mjs"
+    "#code": "./code.mjs",
+    "#android-preload": "./android-preload.cjs"
   },
   "scripts": {
     "build": "obuild"
