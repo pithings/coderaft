@@ -8,7 +8,7 @@
 #   IMAGE  Docker image (default: node:slim)
 #   PORT   Port to expose (default: 6063)
 
-IMAGE="${IMAGE:-node:22-slim}" # Node >=24 has ESM loader deadlocks (Atomics.wait in syncLink)
+IMAGE="${IMAGE:-node:lts-slim}"
 PORT="${PORT:-6063}"
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 

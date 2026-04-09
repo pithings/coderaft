@@ -45,7 +45,7 @@ npx coderaft -o .
 ### Docker
 
 ```sh
-docker run -it --rm -p 6063:6063 node:22-slim npx -y coderaft
+docker run -it --rm -p 6063:6063 node:lts-slim npx -y coderaft
 ```
 
 ## Programmatic

@@ -45,5 +45,10 @@
     "node-pty": "workspace:*",
     "vsda": "workspace:*"
   },
+  "pnpm": {
+    "patchedDependencies": {
+      "code-server": "patches/code-server.patch"
+    }
+  },
   "packageManager": "pnpm@10.33.0"
 }

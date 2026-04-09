@@ -1,3 +1,5 @@
 packages:
   - "lib"
   - "shims/*"
+patchedDependencies:
+  code-server: patches/code-server.patch

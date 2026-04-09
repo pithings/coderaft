@@ -374,18 +374,11 @@ function cleanupStaleLocks(userDataDir: string): void {
 }
 
 // Watches child processes for main-thread deadlocks by reading /proc/<pid>/wchan.
-// On Node >=24, VS Code's extension host deadlocks: it registers a custom ESM
-// resolve hook (module.register) that communicates back to the main thread via
-// MessageChannel to resolve `import "vscode"`. When import() triggers syncLink,
-// the main thread blocks on Atomics.wait() for the hook to respond, but the
-// hook needs the main thread to process the MessageChannel message — circular
-// deadlock. Node 22/23 use async resolution and are unaffected.
 // Only works on Linux.
 function watchChildProcessHealth(): NodeJS.Timeout | undefined {
   if (process.platform !== "linux" && process.platform !== "android") return;
   const stuckCounts = new Map<number, number>();
   const interval = setInterval(() => {
-    // Find extension host child processes
     try {
       for (const pid of readdirSync("/proc").filter((d) => /^\d+$/.test(d))) {
         let cmdline: string;
@@ -401,14 +394,9 @@ function watchChildProcessHealth(): NodeJS.Timeout | undefined {
             const count = (stuckCounts.get(+pid) ?? 0) + 1;
             stuckCounts.set(+pid, count);
             if (count === 3) {
-              const msg = `Extension host (pid ${pid}) main thread stuck in ${wchan} for ${count * 5}s — Node >=24 ESM hook deadlock (Atomics.wait ↔ MessageChannel). Use Node 22.`;
-              const line = "─".repeat(msg.length + 2);
-              console.error(`\x1b[31m┌${line}┐\n│ ${msg} │\n└${line}┘\x1b[0m`);
-            } else if (count >= 6) {
-              // No op for now
-              // console.error(`\x1b[31m[watchdog] Killing deadlocked extension host (pid ${pid}) after ${count * 5}s\x1b[0m`);
-              // try { process.kill(+pid, "SIGKILL"); } catch {}
-              // stuckCounts.delete(+pid);
+              console.error(
+                `[coderaft] Extension host (pid ${pid}) main thread stuck in ${wchan} for ${count * 5}s`,
+              );
             }
           } else {
             stuckCounts.delete(+pid);

@@ -4,21 +4,6 @@ import { parseArgs } from "node:util";
 import type { VSCodeServerOptions } from "./types.ts";
 import { startCodeServer } from "./server.ts";
 
-// Node >=24 deadlocks VS Code's extension host: the ESM loader's syncLink phase
-// blocks the main thread with Atomics.wait() while the custom resolve hook
-// (module.register) needs the main thread to process a MessageChannel response.
-// See scripts/repro-esm-deadlock.mjs for a minimal reproduction.
-const nodeMajor = Number(process.versions.node.split(".")[0]);
-if (nodeMajor >= 24) {
-  const msg = `Node.js v${process.versions.node} deadlocks the extension host (ESM hook ↔ Atomics.wait). Use Node 22.x.`;
-  const line = "─".repeat(msg.length + 2);
-  console.warn(`\x1b[31m┌${line}┐\n│ ${msg} │\n└${line}┘\x1b[0m`);
-} else if (nodeMajor % 2 !== 0) {
-  const msg = `Node.js v${process.versions.node} is an unstable release. Use an LTS version (e.g. ${nodeMajor - 1}.x) to avoid runtime bugs.`;
-  const line = "─".repeat(msg.length + 2);
-  console.warn(`\x1b[33m┌${line}┐\n│ ${msg} │\n└${line}┘\x1b[0m`);
-}
-
 const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: {
