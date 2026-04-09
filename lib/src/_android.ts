@@ -62,20 +62,13 @@ if (process.platform === "android") {
     };
 
     const _spawn = _cp.spawn;
-    _cp.spawn = function spawn(
-      this: typeof _cp,
-      ...spawnArgs: Parameters<typeof _cp.spawn>
-    ) {
+    _cp.spawn = function spawn(this: typeof _cp, ...spawnArgs: Parameters<typeof _cp.spawn>) {
       _injectLdPreload(spawnArgs[2] as Record<string, unknown>);
       return _spawn.apply(this, spawnArgs);
     } as typeof _cp.spawn;
 
     const _fork = _cp.fork;
-    _cp.fork = function fork(
-      this: typeof _cp,
-      modulePath: string,
-      ...rest: unknown[]
-    ) {
+    _cp.fork = function fork(this: typeof _cp, modulePath: string, ...rest: unknown[]) {
       // fork(modulePath, args?, options?) — options can be 2nd or 3rd arg
       for (const arg of rest) {
         if (arg && typeof arg === "object" && !Array.isArray(arg)) {
