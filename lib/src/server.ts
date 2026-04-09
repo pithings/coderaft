@@ -1,3 +1,4 @@
+import "./_android.ts";
 import { randomBytes, randomUUID } from "node:crypto";
 import { readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
@@ -7,28 +8,8 @@ import { serveStatic } from "./static.ts";
 import type { VSCodeServerOptions } from "./types.ts";
 import { loadCode } from "#code";
 
-// Android/Termux reports process.platform as "android" which VS Code's bundled
-// platform switches don't handle (only "win32", "darwin", "linux"). Remap it to
-// "linux" early so all downstream code (ptyHost, agentHost, server-main) works.
-// We also inject it via NODE_OPTIONS so forked child processes (ptyHost,
-// agentHost, file watcher) inherit the fix automatically.
-if (process.platform === "android") {
-  Object.defineProperty(process, "platform", { value: "linux" });
-  const preload = `--import "data:text/javascript,Object.defineProperty(process,'platform',{value:'linux'})"`;
-  process.env.NODE_OPTIONS = process.env.NODE_OPTIONS
-    ? `${process.env.NODE_OPTIONS} ${preload}`
-    : preload;
-}
-
-// Access `os` via CJS require — NOT via a top-level ESM import. When Node sees
-// `import … from "node:os"` it creates an ESM wrapper whose named-export
-// bindings point directly at the original native functions and are immutable.
-// VS Code's bundled server-main.js uses `import { networkInterfaces } from "os"`
-// which resolves through that same wrapper. Patching the CJS exports object
-// *before* any ESM import of "os" exists ensures the ESM wrapper (created lazily
-// on first `import "os"`) picks up our patched function.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const _os: typeof import("node:os") = process.getBuiltinModule?.("os");
+const _os: typeof import("node:os") = process.getBuiltinModule?.("os") ?? require("node:os");
 
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
@@ -126,14 +107,6 @@ export async function createCodeServer(
 
   const { modulesDir } = await loadCode();
   const vsRootPath = join(modulesDir, "code-server", "lib", "vscode");
-
-  // Ensure `os.networkInterfaces()` always returns at least one interface with a
-  // valid MAC. On Termux/Android no real NICs are exposed, causing VS Code's
-  // `getMacAddress()` to throw "Unable to retrieve mac address (unexpected
-  // format)". The machineId then falls back to a random UUID on every boot.
-  // Patching in a deterministic dummy MAC derived from the hostname gives a
-  // stable machineId without touching upstream code.
-  ensureNetworkInterface();
 
   // Load VS Code server module — mute noisy internal logs during init
   const _log = console.log;
@@ -324,36 +297,6 @@ export async function startCodeServer(
       });
     },
   };
-}
-
-function ensureNetworkInterface(): void {
-  const original = _os.networkInterfaces;
-  const BLACKLISTED = new Set(["00:00:00:00:00:00", "ff:ff:ff:ff:ff:ff", "ac:de:48:00:11:22"]);
-  _os.networkInterfaces = function networkInterfaces() {
-    const ifaces = original.call(_os);
-    for (const name in ifaces) {
-      for (const info of ifaces[name]!) {
-        if (info.mac && !BLACKLISTED.has(info.mac)) return ifaces;
-      }
-    }
-    // No valid MAC found — inject a deterministic one derived from hostname
-    const { createHash } = require("node:crypto") as typeof import("node:crypto");
-    const hash = createHash("md5").update(_os.hostname()).digest();
-    // Format as a locally-administered unicast MAC (set bit 1 of first octet)
-    hash[0] = (hash[0]! | 0x02) & 0xfe;
-    const mac = [...hash.subarray(0, 6)].map((b) => b.toString(16).padStart(2, "0")).join(":");
-    ifaces._coderaft = [
-      {
-        address: "10.0.0.1",
-        netmask: "255.255.255.0",
-        family: "IPv4",
-        mac,
-        internal: false,
-        cidr: "10.0.0.1/24",
-      },
-    ];
-    return ifaces;
-  } as typeof _os.networkInterfaces;
 }
 
 function cleanupStaleLocks(userDataDir: string): void {

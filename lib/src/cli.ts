@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import "./_android.ts";
 import { parseArgs } from "node:util";
 import type { VSCodeServerOptions } from "./types.ts";
 import { startCodeServer } from "./server.ts";
