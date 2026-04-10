@@ -139,13 +139,13 @@ interface CodeServerHandle {
 
 ### Server
 
-| Option                        | Description                                       |
-| ----------------------------- | ------------------------------------------------- |
-| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `6063`)    |
-| `-H, --host <host>`           | Host/interface to bind                            |
+| Option                        | Description                                         |
+| ----------------------------- | --------------------------------------------------- |
+| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `6063`)      |
+| `-H, --host <host>`           | Host/interface to bind                              |
 | `--base-url <path>`           | Base URL the server is mounted under (default: `/`) |
-| `--socket-path <path>`        | Path to a socket file to listen on                |
-| `--print-startup-performance` | Print startup timing to stdout                    |
+| `--socket-path <path>`        | Path to a socket file to listen on                  |
+| `--print-startup-performance` | Print startup timing to stdout                      |
 
 ### Auth
 
