@@ -33,7 +33,9 @@ for (const dep of extraDeps) {
   if (dep.startsWith("@")) {
     mkdirSync(dirname(linkPath), { recursive: true });
   }
-  try { rmSync(linkPath, { recursive: true }); } catch {}
+  try {
+    rmSync(linkPath, { recursive: true });
+  } catch {}
   symlinkSync(realpathSync(resolvedPath), linkPath);
   console.log(`Linked extra dep ${dep} → ${resolvedPath}`);
 }
