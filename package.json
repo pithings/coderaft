@@ -8,7 +8,7 @@
   "scripts": {
     "build": "cd lib && pnpm build",
     "dev": "CODE_MODULES_DIR=lib/node_modules node lib/src/cli.ts",
-    "start": "node lib/dist/cli.mjs",
+    "coderaft": "node lib/src/cli.ts",
     "link-deps": "node scripts/link.ts",
     "postinstall": "node scripts/link.ts",
     "fmt": "oxlint . --fix && oxfmt .",

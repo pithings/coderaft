@@ -186,7 +186,6 @@ if (values.help) {
 const vscode: VSCodeServerOptions = {};
 const vsKeys = [
   "server-base-path",
-  "socket-path",
   "print-startup-performance",
   "connection-token-file",
   "without-connection-token",
@@ -249,6 +248,7 @@ if (dir) {
 const handle = await startCodeServer({
   port: values.port ? Number(values.port) : undefined,
   host: values.host,
+  socketPath: values["socket-path"],
   defaultFolder: dir || values["default-folder"],
   connectionToken: values["connection-token"] ?? values.token,
   vscode,

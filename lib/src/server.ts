@@ -51,8 +51,10 @@ export interface CreateCodeServerOptions {
 }
 
 export interface StartCodeServerOptions extends CreateCodeServerOptions {
-  /** TCP port to listen on. Defaults to `$PORT` or `6063`. */
+  /** TCP port to listen on. Defaults to `$PORT` or `6063`. Ignored when `socketPath` is set. */
   port?: number;
+  /** Unix socket path to listen on. When set, `port` and `host` are ignored. */
+  socketPath?: string;
 }
 
 export interface CodeServerHandler {
@@ -66,7 +68,10 @@ export interface CodeServerHandler {
 
 export interface CodeServerHandle {
   server: Server;
-  port: number;
+  /** TCP port the server is bound to, or `undefined` when listening on a unix socket. */
+  port?: number;
+  /** Unix socket path the server is bound to, or `undefined` when listening on TCP. */
+  socketPath?: string;
   url: string;
   connectionToken: string;
   close(): Promise<void>;
@@ -281,6 +286,7 @@ export async function createCodeServer(
 export async function startCodeServer(
   opts: StartCodeServerOptions = {},
 ): Promise<CodeServerHandle> {
+  const socketPath = opts.socketPath;
   const port = opts.port ?? (Number(process.env.PORT) || 6063);
   const handler = await createCodeServer(opts);
 
@@ -292,7 +298,7 @@ export async function startCodeServer(
     handler.handleUpgrade(req, socket, head);
   });
 
-  const listen = (p: number) =>
+  const listenTcp = (p: number) =>
     new Promise<void>((resolve, reject) => {
       server.once("error", reject);
       const cb = () => {
@@ -306,25 +312,49 @@ export async function startCodeServer(
       }
     });
 
-  try {
-    await listen(port);
-  } catch (err: any) {
-    if (err?.code === "EADDRINUSE") {
-      await listen(0);
-    } else {
-      throw err;
+  const listenSocket = (path: string) =>
+    new Promise<void>((resolve, reject) => {
+      // Remove a stale socket file left behind by a previous ungraceful exit.
+      try {
+        unlinkSync(path);
+      } catch {
+        // File doesn't exist — nothing to clean up.
+      }
+      server.once("error", reject);
+      server.listen(path, () => {
+        server.removeListener("error", reject);
+        resolve();
+      });
+    });
+
+  if (socketPath) {
+    await listenSocket(socketPath);
+  } else {
+    try {
+      await listenTcp(port);
+    } catch (err: any) {
+      if (err?.code === "EADDRINUSE") {
+        await listenTcp(0);
+      } else {
+        throw err;
+      }
     }
   }
 
-  const actualPort = (server.address() as { port: number }).port;
+  const address = server.address();
+  const actualPort =
+    address && typeof address === "object" && "port" in address ? address.port : undefined;
 
-  const url = handler.connectionToken
-    ? `http://localhost:${actualPort}/?tkn=${handler.connectionToken}`
-    : `http://localhost:${actualPort}/`;
+  const url = socketPath
+    ? `unix:${socketPath}`
+    : handler.connectionToken
+      ? `http://localhost:${actualPort}/?tkn=${handler.connectionToken}`
+      : `http://localhost:${actualPort}/`;
 
   return {
     server,
     port: actualPort,
+    socketPath,
     url,
     connectionToken: handler.connectionToken,
     async close() {
@@ -333,6 +363,13 @@ export async function startCodeServer(
       await new Promise<void>((resolve, reject) => {
         server.close((err) => (err ? reject(err) : resolve()));
       });
+      if (socketPath) {
+        try {
+          unlinkSync(socketPath);
+        } catch {
+          // Socket already removed.
+        }
+      }
     },
   };
 }
