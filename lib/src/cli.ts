@@ -11,6 +11,7 @@ const { values, positionals } = parseArgs({
     // Server
     port: { type: "string", short: "p" },
     host: { type: "string", short: "H" },
+    "base-url": { type: "string" },
     "server-base-path": { type: "string" },
     "socket-path": { type: "string" },
     "print-startup-performance": { type: "boolean" },
@@ -101,7 +102,7 @@ if (values.help) {
   Server:
     -p, --port <port>                    Port to listen on (default: $PORT or 6063)
     -H, --host <host>                    Host/interface to bind
-        --server-base-path <path>        Base path for the web UI (default: /)
+        --base-url <path>                Base URL the server is mounted under (default: /)
         --socket-path <path>             Path to a socket file to listen on
         --print-startup-performance      Print startup timing to stdout
 
@@ -245,10 +246,33 @@ if (dir) {
   vscode["disable-workspace-trust"] = true;
 }
 
-const handle = await startCodeServer({
+// Register signal handlers BEFORE starting the VS Code server — its
+// `server-main.js` installs its own SIGTERM/SIGINT listeners that call
+// `process.exit()`, and Node runs listeners in registration order. We have
+// to be first or our cleanup (socket file removal, dispose) is skipped.
+let handle: Awaited<ReturnType<typeof startCodeServer>> | undefined;
+let shuttingDown = false;
+const shutdown = () => {
+  if (shuttingDown) {
+    process.exit(0);
+  }
+  shuttingDown = true;
+  // Force exit after 3s if graceful shutdown hangs
+  setTimeout(() => process.exit(0), 3000).unref();
+  if (handle) {
+    handle.close().finally(() => process.exit(0));
+  } else {
+    process.exit(0);
+  }
+};
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
+
+handle = await startCodeServer({
   port: values.port ? Number(values.port) : undefined,
   host: values.host,
   socketPath: values["socket-path"],
+  baseURL: values["base-url"] ?? values["server-base-path"],
   defaultFolder: dir || values["default-folder"],
   connectionToken: values["connection-token"] ?? values.token,
   vscode,
@@ -284,15 +308,3 @@ if (values.open) {
   }
 }
 
-let shuttingDown = false;
-const shutdown = () => {
-  if (shuttingDown) {
-    process.exit(0);
-  }
-  shuttingDown = true;
-  // Force exit after 3s if graceful shutdown hangs
-  setTimeout(() => process.exit(0), 3000).unref();
-  handle.close().finally(() => process.exit(0));
-};
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);

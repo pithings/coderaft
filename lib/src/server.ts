@@ -46,6 +46,12 @@ export interface CreateCodeServerOptions {
   connectionToken?: string;
   /** Host/interface to bind (used to infer local-only access for token default). */
   host?: string;
+  /**
+   * Base URL the server is mounted under (e.g. `/code`). Defaults to `/`.
+   * Forwarded to VS Code as `server-base-path` and honored by coderaft's own
+   * routes (`/healthz`, `/_static/*`, `/proxy/*`, `/login`, …).
+   */
+  baseURL?: string;
   /** Extra options forwarded to VS Code's `createServer()`. */
   vscode?: VSCodeServerOptions;
 }
@@ -89,6 +95,7 @@ export async function createCodeServer(
     opts.vscode?.["without-connection-token"] === true || (!explicitToken && isLocal);
   const connectionToken = withoutToken ? "" : (opts.connectionToken ?? randomUUID());
   const defaultFolder = opts.defaultFolder ?? process.cwd();
+  const baseURL = normalizeBaseURL(opts.baseURL ?? opts.vscode?.["server-base-path"]);
 
   // Stable per-process 32-byte key returned by POST /mint-key. VS Code's
   // `serve-web` flow uses this as one half of a symmetric auth secret. Coder
@@ -135,6 +142,7 @@ export async function createCodeServer(
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,
+    ...(baseURL ? { "server-base-path": baseURL } : {}),
     ...(withoutToken
       ? { "without-connection-token": true }
       : { "connection-token": connectionToken }),
@@ -163,7 +171,8 @@ export async function createCodeServer(
     connectionToken,
     handleRequest(req: IncomingMessage, res: ServerResponse) {
       const method = req.method ?? "GET";
-      const url = (req.url ?? "/").split("?")[0]!;
+      const strippedUrl = stripBaseURL(req.url ?? "/", baseURL);
+      const url = strippedUrl.split("?")[0]!;
 
       // PWA manifest — referenced by workbench.html `<link rel="manifest">`.
       if (url === "/manifest.json") {
@@ -224,7 +233,7 @@ export async function createCodeServer(
       // `/login` + `/logout` — we never enable auth, so mirror coder's no-auth
       // behavior (redirect to root).
       if (url === "/login" || url === "/logout") {
-        res.writeHead(302, { Location: "/" });
+        res.writeHead(302, { Location: `${baseURL}/` });
         res.end();
         return;
       }
@@ -244,7 +253,7 @@ export async function createCodeServer(
       }
 
       // Path-based proxy: /proxy/:port/* → http://127.0.0.1:{port}/*
-      const proxyMatch = parseProxyPath(req.url ?? "/");
+      const proxyMatch = parseProxyPath(strippedUrl);
       if (proxyMatch) {
         const { port: targetPort, path: targetPath } = proxyMatch;
         proxy.web(req, res, {
@@ -259,7 +268,7 @@ export async function createCodeServer(
     },
     handleUpgrade(req: IncomingMessage, socket: Duplex, _head: Buffer) {
       // Path-based proxy: WebSocket upgrade
-      const proxyMatch = parseProxyPath(req.url ?? "/");
+      const proxyMatch = parseProxyPath(stripBaseURL(req.url ?? "/", baseURL));
       if (proxyMatch) {
         const { port: targetPort, path: targetPath } = proxyMatch;
         proxy.ws(
@@ -345,11 +354,12 @@ export async function startCodeServer(
   const actualPort =
     address && typeof address === "object" && "port" in address ? address.port : undefined;
 
+  const basePath = normalizeBaseURL(opts.baseURL ?? opts.vscode?.["server-base-path"]);
   const url = socketPath
     ? `unix:${socketPath}`
     : handler.connectionToken
-      ? `http://localhost:${actualPort}/?tkn=${handler.connectionToken}`
-      : `http://localhost:${actualPort}/`;
+      ? `http://localhost:${actualPort}${basePath}/?tkn=${handler.connectionToken}`
+      : `http://localhost:${actualPort}${basePath}/`;
 
   return {
     server,
@@ -441,6 +451,26 @@ function parseProxyPath(url: string): { port: number; path: string } | undefined
   if (port < 1 || port > 65535) return;
   const path = (match[2] || "/") + query;
   return { port, path };
+}
+
+// Normalize a base URL to either `""` (root) or `/foo/bar` (no trailing slash).
+function normalizeBaseURL(input: string | undefined): string {
+  if (!input || input === "/") return "";
+  let result = input.trim();
+  if (!result.startsWith("/")) result = "/" + result;
+  while (result.endsWith("/")) result = result.slice(0, -1);
+  return result;
+}
+
+// Strip the normalized base URL from a request URL. Leaves the URL untouched
+// if it doesn't sit under the base.
+function stripBaseURL(url: string, baseURL: string): string {
+  if (!baseURL) return url;
+  if (url === baseURL) return "/";
+  if (url.startsWith(baseURL + "/") || url.startsWith(baseURL + "?")) {
+    return url.slice(baseURL.length) || "/";
+  }
+  return url;
 }
 
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
