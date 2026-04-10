@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.0.20
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.19...v0.0.20)
+
+### 🩹 Fixes
+
+- Shim kerberos ([b1ce2e4](https://github.com/pithings/coderaft/commit/b1ce2e4))
+
+### 📦 Build
+
+- Link transitive pnpm deps into vscode node_modules ([7a7c638](https://github.com/pithings/coderaft/commit/7a7c638))
+- Reduce pack ([881c482](https://github.com/pithings/coderaft/commit/881c482))
+- Remove optional msal broker files (has fallback) ([a017fd7](https://github.com/pithings/coderaft/commit/a017fd7))
+
+### 🏡 Chore
+
+- Update docker ([ce1e4f7](https://github.com/pithings/coderaft/commit/ce1e4f7))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.19
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.18...v0.0.19)
