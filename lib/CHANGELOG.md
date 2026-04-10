@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.17
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.16...v0.0.17)
+
+### 🚀 Enhancements
+
+- Support socketPath ([ca1551c](https://github.com/pithings/coderaft/commit/ca1551c))
+- Support base url ([ed7f40e](https://github.com/pithings/coderaft/commit/ed7f40e))
+
+### 🏡 Chore
+
+- Update docker section ([f4ebb2d](https://github.com/pithings/coderaft/commit/f4ebb2d))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.16
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.15...v0.0.16)
