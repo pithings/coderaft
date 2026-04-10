@@ -16,7 +16,10 @@ RUN apk add --no-cache zstd \
   && corepack enable \
   && rm -rf /opt/yarn* /usr/local/lib/node_modules/yarn
 COPY --from=build /tmp/coderaft-*.tgz /tmp/coderaft.tgz
-RUN npm install -g /tmp/coderaft.tgz && rm /tmp/coderaft.tgz \
+RUN mkdir -p /usr/local/lib/node_modules/coderaft \
+  && tar -xzf /tmp/coderaft.tgz -C /usr/local/lib/node_modules/coderaft --strip-components=1 \
+  && ln -s ../lib/node_modules/coderaft/dist/cli.mjs /usr/local/bin/coderaft \
+  && rm /tmp/coderaft.tgz \
   && zstd -19 --rm /usr/local/bin/node -o /usr/local/bin/node.zst \
   && printf '#!/bin/sh\nset -e\nzstd -qd /usr/local/bin/node.zst -o /tmp/.node\nmv /tmp/.node /usr/local/bin/node\nchmod +x /usr/local/bin/node\nrm -f /usr/local/bin/node.zst\nexec /usr/local/bin/node "$@"\n' > /usr/local/bin/node \
   && chmod +x /usr/local/bin/node
