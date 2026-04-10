@@ -22,6 +22,9 @@ const excludeDirPaths = new Set(["katex/src"]);
 const excludeFilePaths = new Set([
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
+  // Native MSAL broker (Linux-only ELF); extension falls back to browser OAuth when missing.
+  "code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
+  "code-server/lib/vscode/extensions/microsoft-authentication/dist/msal-node-runtime.node",
 ]);
 const excludeExts = new Set([".d.ts", ".map", ".mp3"]);
 const excludeNameRe = /^(readme(\.md)?|license(\.md|\.txt)?|releases\.md|security\.md|changelog\.md|support\.md|code_of_conduct\.md|authors\.md)$/i;
@@ -31,6 +34,8 @@ const tarExcludes = [
   "node_modules/katex/src",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
+  "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
+  "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/msal-node-runtime.node",
   "*.map",
   "*.mp3",
   "README.md",
