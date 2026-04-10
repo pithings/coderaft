@@ -27,7 +27,8 @@ const excludeFilePaths = new Set([
   "code-server/lib/vscode/extensions/microsoft-authentication/dist/msal-node-runtime.node",
 ]);
 const excludeExts = new Set([".d.ts", ".map", ".mp3"]);
-const excludeNameRe = /^(readme(\.md)?|license(\.md|\.txt)?|releases\.md|security\.md|changelog\.md|support\.md|code_of_conduct\.md|authors\.md)$/i;
+const excludeNameRe =
+  /^(readme(\.md)?|license(\.md|\.txt)?|releases\.md|security\.md|changelog\.md|support\.md|code_of_conduct\.md|authors\.md)$/i;
 
 const tarExcludes = [
   "node_modules/.bin",
@@ -50,8 +51,13 @@ const tarExcludes = [
 const keepDts = new Set(["typescript/lib"]);
 
 const extGroups: Record<string, string> = {
-  js: "js", mjs: "js", cjs: "js",
-  ts: "ts", mts: "ts", cts: "ts", dts: "ts",
+  js: "js",
+  mjs: "js",
+  cjs: "js",
+  ts: "ts",
+  mts: "ts",
+  cts: "ts",
+  dts: "ts",
 };
 
 type ExtStat = { count: number; size: number };
@@ -92,9 +98,19 @@ function printStats(): void {
   const totalCount = sorted.reduce((a, [, s]) => a + s.count, 0);
   const rows: string[][] = sorted.map(([key, s]) => {
     const share = total ? (s.size / total) * 100 : 0;
-    return [`\`${groupLabel(key)}\``, s.count.toLocaleString("en-US"), human(s.size), `${share.toFixed(1)}%`];
+    return [
+      `\`${groupLabel(key)}\``,
+      s.count.toLocaleString("en-US"),
+      human(s.size),
+      `${share.toFixed(1)}%`,
+    ];
   });
-  rows.push([`**Total**`, `**${totalCount.toLocaleString("en-US")}**`, `**${human(total)}**`, "**100%**"]);
+  rows.push([
+    `**Total**`,
+    `**${totalCount.toLocaleString("en-US")}**`,
+    `**${human(total)}**`,
+    "**100%**",
+  ]);
 
   const headers = ["Type", "Count", "Size", "Share"];
   const aligns: ("<" | ">")[] = ["<", ">", ">", ">"];
