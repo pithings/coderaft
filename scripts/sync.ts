@@ -19,13 +19,24 @@ const extraDeps: Record<string, string> = {
   "@vscode/fs-copyfile": "workspace:*",
 };
 
+// Upstream deps that are not referenced by any bundled code path and
+// should never be installed (keeps the dep tree lean).
+const excludedDeps = new Set<string>([
+  "@anthropic-ai/sandbox-runtime",
+  // Bundled into dist by obuild (see lib/dist/_chunks/libs/httpxy.mjs),
+  // so it must not be listed as a runtime dep.
+  "httpxy",
+]);
+
 // Merge and sort all nested dependencies
 const nestedDeps: Record<string, string> = Object.fromEntries(
   Object.entries<string>({
     ...vscodePkg.dependencies,
     ...extensionsPkg.dependencies,
     ...extraDeps,
-  }).sort(([a], [b]) => a.localeCompare(b)),
+  })
+    .filter(([name]) => !excludedDeps.has(name))
+    .sort(([a], [b]) => a.localeCompare(b)),
 );
 
 // Read the workspace package.json

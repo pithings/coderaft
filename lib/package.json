@@ -23,8 +23,6 @@
     "build": "obuild"
   },
   "devDependencies": {
-    "code-server": "^4.114.1",
-    "@anthropic-ai/sandbox-runtime": "0.0.42",
     "@github/copilot": "workspace:*",
     "@github/copilot-sdk": "workspace:*",
     "@microsoft/1ds-core-js": "workspace:*",
@@ -51,12 +49,14 @@
     "@xterm/addon-webgl": "^0.20.0-beta.190",
     "@xterm/headless": "^6.1.0-beta.191",
     "@xterm/xterm": "^6.1.0-beta.191",
+    "code-server": "^4.114.1",
     "cookie": "^0.7.0",
     "http-proxy-agent": "^7.0.0",
     "https-proxy-agent": "^7.0.2",
+    "httpxy": "^0.5.0",
     "jschardet": "3.1.4",
     "katex": "^0.16.22",
-    "kerberos": "2.1.1",
+    "kerberos": "workspace:*",
     "minimist": "^1.2.8",
     "node-pty": "workspace:*",
     "tas-client": "0.3.1",
@@ -64,7 +64,6 @@
     "vscode-oniguruma": "1.7.0",
     "vscode-regexpp": "^3.1.0",
     "vscode-textmate": "^9.3.2",
-    "httpxy": "^0.5.0",
     "ws": "^8.19.0",
     "yauzl": "^3.0.0",
     "yazl": "^2.4.3"

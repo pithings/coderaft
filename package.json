@@ -42,6 +42,7 @@
     "@vscode/windows-process-tree": "workspace:*",
     "argon2": "workspace:*",
     "fsevents": "workspace:*",
+    "kerberos": "workspace:*",
     "node-pty": "workspace:*",
     "vsda": "workspace:*"
   },
