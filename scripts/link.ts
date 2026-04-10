@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createRequire } from "node:module";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import {
   copyFileSync,
   existsSync,
@@ -48,20 +48,12 @@ for (const targetDir of targets) {
   if (!existsSync(pkgPath)) continue;
 
   const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
-  const deps = [...new Set([...Object.keys(pkg.dependencies || {}), ...extraDeps])];
+  const topDeps = [...new Set([...Object.keys(pkg.dependencies || {}), ...extraDeps])];
 
-  // Clean up stale node_modules before linking
-  const nodeModulesDir = join(targetDir, "node_modules");
-  if (existsSync(nodeModulesDir)) {
-    rmSync(nodeModulesDir, { recursive: true });
-  }
-  mkdirSync(nodeModulesDir, { recursive: true });
-
-  const linkedDeps: string[] = [];
+  // Collect top-level deps (name -> realpath)
+  const collected = new Map<string, string>();
   const skippedDeps: string[] = [];
-  for (const dep of deps) {
-    const linkPath = join(nodeModulesDir, dep);
-
+  for (const dep of topDeps) {
     // Try workspace node_modules first, then fall back to shims directory
     const candidatePath = join(workspaceNodeModules, dep);
     const shimPath = join(shimsDir, dep);
@@ -74,29 +66,91 @@ for (const targetDir of targets) {
       skippedDeps.push(dep);
       continue;
     }
-    const resolvedDir = realpathSync(sourcePath);
+    collected.set(dep, realpathSync(sourcePath));
+  }
+
+  // Walk transitive deps. pnpm's flat layout stores siblings at
+  // `.pnpm/<pkg>@<ver>/node_modules/*`, so when `tar -ch` dereferences the
+  // top-level symlink it only captures <pkg>'s own files. We need to also
+  // link those siblings into the target node_modules.
+  const queue = [...collected.values()];
+  while (queue.length > 0) {
+    const realPath = queue.shift()!;
+    const pkgJsonPath = join(realPath, "package.json");
+    if (!existsSync(pkgJsonPath)) continue;
+    let depPkg: any;
+    try {
+      depPkg = JSON.parse(readFileSync(pkgJsonPath, "utf8"));
+    } catch {
+      continue;
+    }
+    const childDeps = [
+      ...Object.keys(depPkg.dependencies || {}),
+      ...Object.keys(depPkg.optionalDependencies || {}),
+    ];
+    for (const child of childDeps) {
+      if (collected.has(child)) continue;
+      const source = resolveDepFrom(realPath, child);
+      if (!source) continue;
+      const childReal = realpathSync(source);
+      collected.set(child, childReal);
+      queue.push(childReal);
+    }
+  }
+
+  // Clean up stale node_modules before linking
+  const nodeModulesDir = join(targetDir, "node_modules");
+  if (existsSync(nodeModulesDir)) {
+    rmSync(nodeModulesDir, { recursive: true });
+  }
+  mkdirSync(nodeModulesDir, { recursive: true });
+
+  const linkedTop: string[] = [];
+  const linkedTransitive: string[] = [];
+  for (const [dep, resolvedDir] of collected) {
+    const linkPath = join(nodeModulesDir, dep);
 
     // Ensure parent dir exists for scoped packages (@scope/name)
     if (dep.startsWith("@")) {
       mkdirSync(dirname(linkPath), { recursive: true });
     }
 
-    // Remove existing link/dir and create symlink
     if (existsSync(linkPath)) {
       rmSync(linkPath, { recursive: true });
     }
     symlinkSync(resolvedDir, linkPath);
-    linkedDeps.push(dep);
+    if (topDeps.includes(dep)) linkedTop.push(dep);
+    else linkedTransitive.push(dep);
   }
 
   console.log(
-    `Linked ${linkedDeps.length}/${deps.length} dependencies into ${targetDir}/node_modules`,
+    `Linked ${linkedTop.length}/${topDeps.length} top-level + ${linkedTransitive.length} transitive into ${targetDir}/node_modules`,
   );
-  for (const dep of linkedDeps) {
+  for (const dep of linkedTop) {
     console.log(`  + ${dep}`);
+  }
+  for (const dep of linkedTransitive) {
+    console.log(`  ~ ${dep}`);
   }
   for (const dep of skippedDeps) {
     console.warn(`  ! ${dep} (not found, skipped)`);
+  }
+}
+
+// Resolve a dep from `fromPkgRealPath`, handling both nested (shim) and
+// pnpm-flat (sibling under the nearest node_modules) layouts.
+function resolveDepFrom(fromPkgRealPath: string, depName: string): string | null {
+  const own = join(fromPkgRealPath, "node_modules", depName);
+  if (existsSync(own)) return own;
+  let current = fromPkgRealPath;
+  while (true) {
+    const parent = dirname(current);
+    if (parent === current) return null;
+    if (basename(parent) === "node_modules") {
+      const sibling = join(parent, depName);
+      return existsSync(sibling) ? sibling : null;
+    }
+    current = parent;
   }
 }
 
