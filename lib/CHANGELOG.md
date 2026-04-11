@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.21
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.20...v0.0.21)
+
+### 🩹 Fixes
+
+- Windows compatibility issues ([575ffe5](https://github.com/pithings/coderaft/commit/575ffe5))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.20
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.19...v0.0.20)
