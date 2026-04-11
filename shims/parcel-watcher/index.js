@@ -19,6 +19,25 @@ if (!process.listenerCount("SIGINT")) {
   process.on("SIGINT", () => {});
 }
 
+// On Android/Termux the kernel caps `fs.inotify.max_user_watches` very low
+// and the limit can't be raised, so virtually every `fs.watch()` call after
+// the first handful fails with ENOSPC. Restricted system dirs (/apex/*,
+// /system/*) also fail with EACCES/EPERM. Swallow these silently — the path
+// just isn't watched, which is the effective outcome anyway. Warn once per
+// code so the user knows why.
+const SILENCED_WATCH_ERRORS = new Set(["ENOSPC", "EACCES", "EPERM"]);
+const warnedWatchErrors = new Set();
+function isSilencedWatchError(err) {
+  if (!err || !SILENCED_WATCH_ERRORS.has(err.code)) return false;
+  if (!warnedWatchErrors.has(err.code)) {
+    warnedWatchErrors.add(err.code);
+    console.warn(
+      `[coderaft] fs.watch ${err.code} — @parcel/watcher shim silently dropping watches (further ${err.code} errors suppressed)`,
+    );
+  }
+  return true;
+}
+
 class AsyncSubscription {
   /** @param {fs.FSWatcher} watcher */
   constructor(watcher) {
@@ -49,12 +68,16 @@ async function subscribe(dir, fn, _opts) {
       fn(null, [{ path: fullPath, type }]);
     });
   } catch (err) {
-    // fs.watch throws synchronously on permission errors (EACCES) or missing dirs.
-    // Return a no-op subscription instead of crashing the caller.
-    fn(err, []);
+    // fs.watch throws synchronously on permission errors (EACCES) or missing
+    // dirs. Return a no-op subscription instead of crashing the caller.
+    // On Android/Termux, swallow ENOSPC/EACCES/EPERM silently (see above).
+    if (!isSilencedWatchError(err)) fn(err, []);
     return new AsyncSubscription({ close() {} });
   }
-  watcher.on("error", (err) => fn(err, []));
+  watcher.on("error", (err) => {
+    if (isSilencedWatchError(err)) return;
+    fn(err, []);
+  });
   return new AsyncSubscription(watcher);
 }
 
