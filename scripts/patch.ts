@@ -127,6 +127,40 @@ code = code.replace(
 
 writeFileSync(extHostPath, code);
 
+// Step 2b: Fix `Platform not supported` throw in userDataPath switch.
+//
+// VS Code's `vs/platform/environment/node/userDataPath.ts` has a
+// `switch (process.platform)` with a `default: throw new Error("Platform not
+// supported")` branch. On Termux, `process.platform === "android"` hits that
+// branch and crashes server/pty-host/agent-host startup. The same switch gets
+// bundled into multiple entry files, so we patch each one.
+//
+// Fix: rewrite `case"linux":<body>;break;default:throw ...` so linux falls
+// through from default, giving unknown platforms the XDG/~/.config code path.
+const platformSwitchFiles = [
+  "lib/vscode/out/server-main.js",
+  "lib/vscode/out/vs/platform/terminal/node/ptyHostMain.js",
+  "lib/vscode/out/vs/platform/agentHost/node/agentHostMain.js",
+];
+
+// Variable names (`Ht`, `va`, etc.) differ per bundle due to minification,
+// so match them with a regex rather than literal strings.
+const platformSwitchRe =
+  /case"linux":((?:(?!break;).)*?)break;default:throw new Error\("Platform not supported"\)/;
+
+for (const rel of platformSwitchFiles) {
+  const filePath = `${patchDir}/${rel}`;
+  let src = readFileSync(filePath, "utf8");
+  const match = src.match(platformSwitchRe);
+  if (!match) {
+    console.error(`Cannot patch ${rel} — platform switch pattern not found`);
+    process.exit(1);
+  }
+  src = src.replace(platformSwitchRe, `case"linux":default:${match[1]}break`);
+  writeFileSync(filePath, src);
+  console.log(`Patched platform switch in ${rel}`);
+}
+
 // Step 3: Commit the patch
 execSync(`pnpm patch-commit '${patchDir}'`, {
   encoding: "utf8",

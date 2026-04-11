@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   code-server:
-    hash: 45a83a8102aa294294d287dcd9889d4e46bba589f7e840f0be9faa2c85a87474
+    hash: f27e6f7bc69f43c9eddb7727952e605173ad828b852080c65527053e72c260e9
     path: patches/code-server.patch
 
 importers:
@@ -117,7 +117,7 @@ importers:
         version: 6.1.0-beta.197
       code-server:
         specifier: ^4.114.1
-        version: 4.114.1(patch_hash=45a83a8102aa294294d287dcd9889d4e46bba589f7e840f0be9faa2c85a87474)(typescript@6.0.2)
+        version: 4.114.1(patch_hash=f27e6f7bc69f43c9eddb7727952e605173ad828b852080c65527053e72c260e9)(typescript@6.0.2)
       cookie:
         specifier: ^0.7.0
         version: 0.7.2
@@ -2829,7 +2829,7 @@ snapshots:
     dependencies:
       readdirp: 5.0.0
 
-  code-server@4.114.1(patch_hash=45a83a8102aa294294d287dcd9889d4e46bba589f7e840f0be9faa2c85a87474)(typescript@6.0.2):
+  code-server@4.114.1(patch_hash=f27e6f7bc69f43c9eddb7727952e605173ad828b852080c65527053e72c260e9)(typescript@6.0.2):
     dependencies:
       '@coder/logger': 3.0.1
       argon2: 0.44.0
