@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.0.23
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.22...v0.0.23)
+
+### 🩹 Fixes
+
+- **android:** Remove hardcoded platform override from preload ([4537ac6](https://github.com/pithings/coderaft/commit/4537ac6))
+- Reduce watch errors spam ([92fdb2a](https://github.com/pithings/coderaft/commit/92fdb2a))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.22
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.21...v0.0.22)
