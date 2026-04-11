@@ -4,9 +4,6 @@ import { fileURLToPath } from "node:url";
 
 // We check the original platform value before overriding it.
 if (process.platform === "android") {
-  // Termux reports process.platform as "android" which VS Code doesn't handle.
-  Object.defineProperty(process, "platform", { value: "linux" });
-
   // Ensure process.execPath points to the real node binary (not linker64).
   // The main process usually has termux-exec via LD_PRELOAD, but check anyway.
   if (process.execPath.includes("linker64") || process.execPath.startsWith("/apex/")) {
