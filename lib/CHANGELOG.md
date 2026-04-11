@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.22
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.21...v0.0.22)
+
+### 🩹 Fixes
+
+- **android:** Only patch platform where needed ([e45688c](https://github.com/pithings/coderaft/commit/e45688c))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.21
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.20...v0.0.21)
