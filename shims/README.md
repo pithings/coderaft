@@ -29,26 +29,26 @@ Additionally, `coderaft` uses a minimal Node.js `http` server instead of the Exp
 
 The mappings configured in root [`package.json`](../package.json):
 
-| Package                        | Override                        |
-| ------------------------------ | ------------------------------- |
-| `vsda`                         | `shims/vsda/`                   |
-| `@github/copilot`              | `shims/github-copilot/`         |
-| `@github/copilot-sdk`          | `shims/github-copilot-sdk/`     |
-| `node-pty`                     | `shims/node-pty/`               |
-| `@vscode/spdlog`               | `shims/spdlog/`                 |
-| `@vscode/fs-copyfile`          | `shims/vscode-fs-copyfile/`     |
-| `@vscode/deviceid`             | `shims/vscode-deviceid/`        |
-| `@vscode/native-watchdog`      | `shims/vscode-native-watchdog/` |
-| `@vscode/ripgrep`              | `shims/vscode-ripgrep/`         |
-| `@parcel/watcher`              | `shims/parcel-watcher/`         |
-| `fsevents`                     | `shims/fsevents/`               |
-| `@vscode/windows-process-tree` | `shims/windows-process-tree/`   |
-| `@vscode/windows-registry`     | `shims/vscode-windows-registry/`|
-| `argon2`                       | `shims/argon2/`                 |
-| `@vscode/proxy-agent`          | `shims/vscode-proxy-agent/`     |
-| `@microsoft/1ds-core-js`       | `shims/1ds-core-js/`            |
-| `@microsoft/1ds-post-js`       | `shims/1ds-post-js/`            |
-| `kerberos`                     | `shims/kerberos/`               |
+| Package                        | Override                         |
+| ------------------------------ | -------------------------------- |
+| `vsda`                         | `shims/vsda/`                    |
+| `@github/copilot`              | `shims/github-copilot/`          |
+| `@github/copilot-sdk`          | `shims/github-copilot-sdk/`      |
+| `node-pty`                     | `shims/node-pty/`                |
+| `@vscode/spdlog`               | `shims/spdlog/`                  |
+| `@vscode/fs-copyfile`          | `shims/vscode-fs-copyfile/`      |
+| `@vscode/deviceid`             | `shims/vscode-deviceid/`         |
+| `@vscode/native-watchdog`      | `shims/vscode-native-watchdog/`  |
+| `@vscode/ripgrep`              | `shims/vscode-ripgrep/`          |
+| `@parcel/watcher`              | `shims/parcel-watcher/`          |
+| `fsevents`                     | `shims/fsevents/`                |
+| `@vscode/windows-process-tree` | `shims/windows-process-tree/`    |
+| `@vscode/windows-registry`     | `shims/vscode-windows-registry/` |
+| `argon2`                       | `shims/argon2/`                  |
+| `@vscode/proxy-agent`          | `shims/vscode-proxy-agent/`      |
+| `@microsoft/1ds-core-js`       | `shims/1ds-core-js/`             |
+| `@microsoft/1ds-post-js`       | `shims/1ds-post-js/`             |
+| `kerberos`                     | `shims/kerberos/`                |
 
 The `sync-deps` script does not need special handling for these — overrides work at the pnpm resolution level.
 
