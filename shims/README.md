@@ -16,6 +16,7 @@ This directory contains workspace packages that replace native/heavy dependencie
 - [`parcel-watcher/`](./parcel-watcher/) — Replaces [`@parcel/watcher`](https://github.com/parcel-bundler/watcher) (native C++ file watcher with node-gyp) with Node.js built-in `fs.watch` (recursive mode). Trades snapshot/history features for zero native binaries.
 - [`fsevents/`](./fsevents/) — No-op shim for [`fsevents`](https://github.com/fsevents/fsevents) (macOS-only native FSEvents binding). Consumers already fall back to `fs.watch`/polling when unavailable.
 - [`windows-process-tree/`](./windows-process-tree/) — Replaces [`@vscode/windows-process-tree`](https://github.com/nicedoc/windows-process-tree) (Windows-only native addon) with cross-platform process inspection using `ps` (Unix) / `wmic` (Windows).
+- [`vscode-windows-registry/`](./vscode-windows-registry/) — Stub for [`@vscode/windows-registry`](https://www.npmjs.com/package/@vscode/windows-registry) (native C++ registry addon with unbuilt `binding.gyp`). Only used by VS Code's telemetry/machine-id code (`GetStringRegKey("HKEY_LOCAL_MACHINE", …, "MachineId")`); callers already handle errors and fall back to defaults.
 - [`argon2/`](./argon2/) — Replaces [`argon2`](https://github.com/ranisalt/node-argon2) (native C binding) with Node.js `crypto.scrypt`. Encodes/decodes PHC-format hashes for compatibility with existing stored passwords.
 - [`vscode-proxy-agent/`](./vscode-proxy-agent/) — No-op shim for [`@vscode/proxy-agent`](https://github.com/microsoft/vscode-proxy-agent) (proxy resolver with heavy deps: `undici`, `socks-proxy-agent`, `http-proxy-agent`, etc.). Passes through Node.js native `http`/`https`/`net`/`tls` unmodified. Users behind a proxy can rely on `HTTP_PROXY`/`HTTPS_PROXY` env vars.
 - [`1ds-core-js/`](./1ds-core-js/) — No-op shim for [`@microsoft/1ds-core-js`](https://www.npmjs.com/package/@microsoft/1ds-core-js) (Microsoft 1DS telemetry core). Silently drops all telemetry events. Also eliminates transitive deps: `@microsoft/applicationinsights-core-js`, `@microsoft/dynamicproto-js`, `@microsoft/applicationinsights-shims`.
@@ -42,6 +43,7 @@ The mappings configured in root [`package.json`](../package.json):
 | `@parcel/watcher`              | `shims/parcel-watcher/`         |
 | `fsevents`                     | `shims/fsevents/`               |
 | `@vscode/windows-process-tree` | `shims/windows-process-tree/`   |
+| `@vscode/windows-registry`     | `shims/vscode-windows-registry/`|
 | `argon2`                       | `shims/argon2/`                 |
 | `@vscode/proxy-agent`          | `shims/vscode-proxy-agent/`     |
 | `@microsoft/1ds-core-js`       | `shims/1ds-core-js/`            |
@@ -60,11 +62,7 @@ Remaining `.node` binaries in `lib/node_modules` (after shimming):
 | `ms-vscode.js-debug` (ext)       | ~460K | win32-x64 + win32-arm64        | bundled    |
 | `microsoft-authentication` (ext) | ~400K | linux-x64 only                 | bundled    |
 
-All other native packages (`@github/copilot`, `@vscode/spdlog`, `@vscode/native-watchdog`, `@vscode/windows-process-tree`, `@vscode/deviceid`, `@parcel/watcher`, `fsevents`, `argon2`, `kerberos`) are fully shimmed with zero native binaries.
-
-### Packages with `binding.gyp` but no compiled binaries
-
-- `@vscode/windows-registry` — not built
+All other native packages (`@github/copilot`, `@vscode/spdlog`, `@vscode/native-watchdog`, `@vscode/windows-process-tree`, `@vscode/windows-registry`, `@vscode/deviceid`, `@parcel/watcher`, `fsevents`, `argon2`, `kerberos`) are fully shimmed with zero native binaries.
 
 ### Notes
 

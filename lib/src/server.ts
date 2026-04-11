@@ -4,6 +4,7 @@ import { readdirSync, readFileSync, unlinkSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { join } from "node:path";
 import type { Duplex } from "node:stream";
+import { pathToFileURL } from "node:url";
 import { createProxyServer } from "httpxy";
 import { serveStatic } from "./static.ts";
 import type { VSCodeServerOptions } from "./types.ts";
@@ -129,7 +130,7 @@ export async function createCodeServer(
     if (args.length === 2 && typeof args[1] === "string" && !args[1].trim()) return;
     _log(...args);
   };
-  const mod = await import(join(vsRootPath, "out/server-main.js"));
+  const mod = await import(pathToFileURL(join(vsRootPath, "out/server-main.js")).href);
   // Override product branding from upstream "code-server" to "coderaft"
   const _product = (globalThis as Record<string, unknown>)._VSCODE_PRODUCT_JSON as
     | Record<string, unknown>

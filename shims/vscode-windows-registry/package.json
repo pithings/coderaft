@@ -1,0 +1,6 @@
+{
+  "name": "@vscode/windows-registry",
+  "version": "1.2.0",
+  "private": true,
+  "main": "./index.js"
+}

@@ -83,8 +83,8 @@ importers:
         specifier: workspace:*
         version: link:../shims/windows-process-tree
       '@vscode/windows-registry':
-        specifier: ^1.2.0
-        version: 1.2.0
+        specifier: workspace:*
+        version: link:../shims/vscode-windows-registry
       '@xterm/addon-clipboard':
         specifier: ^0.3.0-beta.191
         version: 0.3.0-beta.197(@xterm/xterm@6.1.0-beta.197)
@@ -207,6 +207,8 @@ importers:
       ripgrep:
         specifier: ^0.3.1
         version: 0.3.1
+
+  shims/vscode-windows-registry: {}
 
   shims/vsda: {}
 
@@ -971,9 +973,6 @@ packages:
   '@vscode/vscode-languagedetection@1.0.23':
     resolution: {integrity: sha512-Ywk6vXC81nUHvc9WX3uFJG/UHFLXDYJgNeUVirBLJGvmchXHdapsGeAYclNqO1thQLmykmJhSouIZV+JJS8o1A==}
     hasBin: true
-
-  '@vscode/windows-registry@1.2.0':
-    resolution: {integrity: sha512-IouvAGIIjPDKsLlBkdjVgfHrE+s4aESXzyQWwEPzbzHumKbCqIL5n54PNX0R4PHkYQlbinVrXn282KGSO4cr9A==}
 
   '@xterm/addon-clipboard@0.3.0-beta.197':
     resolution: {integrity: sha512-o0u0xR/6QwTj7WytfMaNbz4Gm/lp2eW3EFzHN6LvQhqZEBdMt+GUb/GHgCM7YO35TP21W7DInqvZl+1WOzanJQ==}
@@ -2660,8 +2659,6 @@ snapshots:
   '@vscode/tree-sitter-wasm@0.3.1': {}
 
   '@vscode/vscode-languagedetection@1.0.23': {}
-
-  '@vscode/windows-registry@1.2.0': {}
 
   '@xterm/addon-clipboard@0.3.0-beta.197(@xterm/xterm@6.1.0-beta.197)':
     dependencies:
