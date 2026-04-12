@@ -14,7 +14,9 @@ const LogLevel = {
 
 let globalLevel = LogLevel.Info;
 
-const colorsEnabled = process.stdout.isTTY && process.env.NO_COLOR === undefined;
+const colorsEnabled =
+  (process.stdout.isTTY || process.env.FORCE_COLOR !== undefined) &&
+  process.env.NO_COLOR === undefined;
 
 const c = (code) => (s) => (colorsEnabled ? `\x1b[${code}m${s}\x1b[0m` : s);
 const dim = c("2");
