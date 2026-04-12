@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.24
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.23...v0.0.24)
+
+### 🚀 Enhancements
+
+- Tui mode ([889d61d](https://github.com/pithings/coderaft/commit/889d61d))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.23
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.22...v0.0.23)
