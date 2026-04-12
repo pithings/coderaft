@@ -245,11 +245,11 @@ interface CodeServerHandle {
 
 ### Other
 
-| Option               | Description                                            |
-| -------------------- | ------------------------------------------------------ |
-| `--no-fork`          | Run server in the main process (no subprocess)         |
-| `--no-tui`           | Disable interactive terminal UI (alt screen with logs) |
-| `-o, --open`         | Open in browser on startup                             |
+| Option       | Description                                            |
+| ------------ | ------------------------------------------------------ |
+| `--no-fork`  | Run server in the main process (no subprocess)         |
+| `--no-tui`   | Disable interactive terminal UI (alt screen with logs) |
+| `-o, --open` | Open in browser on startup                             |
 
 ### Debugging
 
