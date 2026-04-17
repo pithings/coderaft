@@ -15,6 +15,12 @@
     "code.tar.zst"
   ],
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
   "imports": {
     "#code": "./code.mjs",
     "#android-preload": "./android-preload.cjs"
