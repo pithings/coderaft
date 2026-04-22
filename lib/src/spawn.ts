@@ -39,10 +39,7 @@ type WorkerMessage =
 
 export interface SpawnedCodeServer {
   /** Emitted when the worker process exits (other than via `close()` / `reload()`). */
-  on(
-    event: "exit",
-    listener: (code: number | null, signal: NodeJS.Signals | null) => void,
-  ): this;
+  on(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
   /** Emitted when the worker emits an `error` (spawn failure, IPC send failure, …). */
   on(event: "error", listener: (err: Error) => void): this;
   on(event: string, listener: (...args: unknown[]) => void): this;
@@ -142,9 +139,7 @@ export class SpawnedCodeServer extends EventEmitter {
   }
 }
 
-export function spawnCodeServer(
-  opts: SpawnCodeServerOptions = {},
-): Promise<SpawnedCodeServer> {
+export function spawnCodeServer(opts: SpawnCodeServerOptions = {}): Promise<SpawnedCodeServer> {
   return SpawnedCodeServer.spawn(opts);
 }
 
