@@ -365,6 +365,10 @@ export async function startCodeServer(
     const baseUrl = new URL(`http://localhost:${actualPort}${basePath}/`);
     if (handler.connectionToken) baseUrl.searchParams.set("tkn", handler.connectionToken);
     if (opts.openFile) {
+      // VS Code's workbench reads `payload` as Map entries: new Map(JSON.parse(payload)).
+      // The `openFile` key is handled by BrowserWorkbenchEnvironmentService.filesToOpenOrCreate.
+      // The URI must use the `vscode-remote` scheme with authority "remote" — the hardcoded
+      // value set by server-main.js for all non-test local server instances.
       baseUrl.searchParams.set(
         "payload",
         JSON.stringify([["openFile", `vscode-remote://remote${opts.openFile}`]]),
