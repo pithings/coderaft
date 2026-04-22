@@ -135,6 +135,34 @@ interface CodeServerHandle {
 }
 ```
 
+### `spawnCodeServer(options)`
+
+Runs the code-server in a forked Node.js child process — useful for isolating VS Code's singletons from the host or restarting the server without taking the host down. Accepts the same options as `startCodeServer`, plus a `spawn` sub-object (`env`, `execArgv`, `stdio`, `startupTimeout`).
+
+```ts
+import { spawnCodeServer } from "coderaft";
+
+const instance = await spawnCodeServer({
+  port: 6063,
+  defaultFolder: "/path/to/workspace",
+});
+
+console.log(`Ready at ${instance.url}`);
+
+// Notify on unexpected worker exits (not fired during close/reload):
+instance.on("exit", (code, signal) => {
+  console.warn(`worker died code=${code} signal=${signal}`);
+});
+
+// Restart the worker in place (reads fresh url/port/connectionToken after):
+await instance.reload();
+
+// Graceful shutdown — SIGTERM to the worker, then SIGKILL after 5s:
+await instance.close();
+```
+
+Options cross an IPC boundary, so nested values (`vscode`, etc.) must be JSON-compatible.
+
 ## CLI Options
 
 ### Server
