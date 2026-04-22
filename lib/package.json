@@ -1,6 +1,6 @@
 {
   "name": "coderaft",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "repository": "pithings/coderaft",
   "bin": {
     "coderaft": "./dist/cli.mjs"
@@ -15,6 +15,10 @@
     "code.tar.zst"
   ],
   "type": "module",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
   "imports": {
     "#code": "./code.mjs",
     "#android-preload": "./android-preload.cjs"

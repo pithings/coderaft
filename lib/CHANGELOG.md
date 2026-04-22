@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.0.25
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.24...v0.0.25)
+
+### 📦 Build
+
+- Add missing exports field ([#3](https://github.com/pithings/coderaft/pull/3))
+- Node10 ts compat ([a77aa5e](https://github.com/pithings/coderaft/commit/a77aa5e))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Mickaël Alves ([@mickaelalvs](https://github.com/mickaelalvs))
+
 ## v0.0.24
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.23...v0.0.24)
