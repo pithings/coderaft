@@ -10,7 +10,7 @@ export interface SpawnProcessOptions {
   execArgv?: string[];
   /**
    * stdio for the forked worker. Defaults to `"inherit"` for stdout/stderr and
-   * `"ignore"` for stdin. Pass `"pipe"` to capture output via `handle.child`.
+   * `"ignore"` for stdin. Pass `"pipe"` to capture output via `handle.proc`.
    */
   stdio?: "inherit" | "pipe" | "ignore";
   /**
@@ -26,7 +26,7 @@ export interface SpawnCodeServerOptions extends StartCodeServerOptions {
 }
 
 interface WorkerState {
-  child: ChildProcess;
+  proc: ChildProcess;
   url: string;
   port?: number;
   socketPath?: string;
@@ -49,46 +49,29 @@ export interface SpawnedCodeServer {
 }
 
 export class SpawnedCodeServer extends EventEmitter {
+  /** The forked worker process (changes after `reload`). */
+  proc!: ChildProcess;
+  url!: string;
+  /** TCP port the server is bound to, or `undefined` when listening on a unix socket. */
+  port?: number;
+  /** Unix socket path the server is bound to, or `undefined` when listening on TCP. */
+  socketPath?: string;
+  connectionToken!: string;
+
   readonly #opts: SpawnCodeServerOptions;
-  #state: WorkerState;
-  #detachListeners: () => void;
+  #detach!: () => void;
   #reloading: Promise<void> | undefined;
   #closed = false;
 
   private constructor(opts: SpawnCodeServerOptions, state: WorkerState) {
     super();
     this.#opts = opts;
-    this.#state = state;
-    this.#detachListeners = this.#attachListeners(state.child);
+    this.#adopt(state);
   }
 
   /** Spawn a new worker and resolve with a handle once it reports ready. */
   static async spawn(opts: SpawnCodeServerOptions = {}): Promise<SpawnedCodeServer> {
-    const state = await spawnWorker(opts);
-    return new SpawnedCodeServer(opts, state);
-  }
-
-  /** The forked worker process (changes after `reload`). */
-  get child(): ChildProcess {
-    return this.#state.child;
-  }
-
-  /** TCP port the server is bound to, or `undefined` when listening on a unix socket. */
-  get port(): number | undefined {
-    return this.#state.port;
-  }
-
-  /** Unix socket path the server is bound to, or `undefined` when listening on TCP. */
-  get socketPath(): string | undefined {
-    return this.#state.socketPath;
-  }
-
-  get url(): string {
-    return this.#state.url;
-  }
-
-  get connectionToken(): string {
-    return this.#state.connectionToken;
+    return new SpawnedCodeServer(opts, await spawnWorker(opts));
   }
 
   /** Terminate the worker process. Sends SIGTERM, then SIGKILL after 5s. Idempotent. */
@@ -99,11 +82,11 @@ export class SpawnedCodeServer extends EventEmitter {
       try {
         await this.#reloading;
       } catch {
-        // Reload failed; fall through to terminate whatever #state points at.
+        // Reload failed; fall through to terminate whatever child we have.
       }
     }
-    this.#detachListeners();
-    await terminateChild(this.#state.child);
+    this.#detach();
+    await terminateChild(this.proc);
   }
 
   /** Kill the current worker and spawn a new one with the original options. */
@@ -111,25 +94,24 @@ export class SpawnedCodeServer extends EventEmitter {
     if (this.#closed) throw new Error("SpawnedCodeServer is closed");
     if (this.#reloading) return this.#reloading;
     this.#reloading = (async () => {
-      this.#detachListeners();
-      await terminateChild(this.#state.child);
+      this.#detach();
+      await terminateChild(this.proc);
       if (this.#closed) throw new Error("SpawnedCodeServer was closed during reload");
       let next: WorkerState;
       try {
         next = await spawnWorker(this.#opts);
       } catch (err) {
-        // Spawn failed — re-attach listeners to the (now-dead) old child so
+        // Spawn failed — re-attach listeners to the (now-dead) old proc so
         // the handle stays observable. Caller gets the error and can decide
         // to retry `reload()` or `close()`.
-        this.#detachListeners = this.#attachListeners(this.#state.child);
+        this.#detach = this.#attachListeners(this.proc);
         throw err;
       }
       if (this.#closed) {
-        await terminateChild(next.child);
+        await terminateChild(next.proc);
         throw new Error("SpawnedCodeServer was closed during reload");
       }
-      this.#state = next;
-      this.#detachListeners = this.#attachListeners(next.child);
+      this.#adopt(next);
     })();
     try {
       await this.#reloading;
@@ -138,15 +120,24 @@ export class SpawnedCodeServer extends EventEmitter {
     }
   }
 
-  #attachListeners(child: ChildProcess): () => void {
+  #adopt(state: WorkerState): void {
+    this.proc = state.proc;
+    this.url = state.url;
+    this.port = state.port;
+    this.socketPath = state.socketPath;
+    this.connectionToken = state.connectionToken;
+    this.#detach = this.#attachListeners(state.proc);
+  }
+
+  #attachListeners(proc: ChildProcess): () => void {
     const onExit = (code: number | null, signal: NodeJS.Signals | null) =>
       this.emit("exit", code, signal);
     const onError = (err: Error) => this.emit("error", err);
-    child.on("exit", onExit);
-    child.on("error", onError);
+    proc.on("exit", onExit);
+    proc.on("error", onError);
     return () => {
-      child.off("exit", onExit);
-      child.off("error", onError);
+      proc.off("exit", onExit);
+      proc.off("error", onError);
     };
   }
 }
@@ -168,7 +159,7 @@ async function spawnWorker(opts: SpawnCodeServerOptions): Promise<WorkerState> {
   const childEnv: NodeJS.ProcessEnv = { ...process.env, ...env };
   delete childEnv.CODE_SERVER_PARENT_PID;
 
-  const child = fork(workerPath, {
+  const proc = fork(workerPath, {
     stdio: ["ignore", stdio, stdio, "ipc"],
     env: childEnv,
     ...(execArgv !== undefined ? { execArgv } : {}),
@@ -190,25 +181,25 @@ async function spawnWorker(opts: SpawnCodeServerOptions): Promise<WorkerState> {
     };
     const onError = (err: Error) => {
       cleanup();
-      child.kill("SIGKILL");
+      proc.kill("SIGKILL");
       reject(err);
     };
     const timer = setTimeout(() => {
       cleanup();
-      child.kill("SIGKILL");
+      proc.kill("SIGKILL");
       reject(new Error(`coderaft worker did not become ready within ${startupTimeout}ms`));
     }, startupTimeout);
     timer.unref?.();
     const cleanup = () => {
       clearTimeout(timer);
-      child.off("message", onMessage);
-      child.off("exit", onExit);
-      child.off("error", onError);
+      proc.off("message", onMessage);
+      proc.off("exit", onExit);
+      proc.off("error", onError);
     };
-    child.on("message", onMessage);
-    child.once("exit", onExit);
-    child.once("error", onError);
-    child.send({ type: "start", opts: serverOpts }, (err) => {
+    proc.on("message", onMessage);
+    proc.once("exit", onExit);
+    proc.once("error", onError);
+    proc.send({ type: "start", opts: serverOpts }, (err) => {
       if (err) {
         cleanup();
         reject(err);
@@ -217,7 +208,7 @@ async function spawnWorker(opts: SpawnCodeServerOptions): Promise<WorkerState> {
   });
 
   return {
-    child,
+    proc,
     url: ready.url,
     port: ready.port,
     socketPath: ready.socketPath,
@@ -225,19 +216,19 @@ async function spawnWorker(opts: SpawnCodeServerOptions): Promise<WorkerState> {
   };
 }
 
-async function terminateChild(child: ChildProcess): Promise<void> {
-  if (child.exitCode !== null || child.signalCode !== null) return;
+async function terminateChild(proc: ChildProcess): Promise<void> {
+  if (proc.exitCode !== null || proc.signalCode !== null) return;
   await new Promise<void>((resolve) => {
     const timer = setTimeout(() => {
-      if (child.exitCode === null && child.signalCode === null) {
-        child.kill("SIGKILL");
+      if (proc.exitCode === null && proc.signalCode === null) {
+        proc.kill("SIGKILL");
       }
     }, 5000);
     timer.unref?.();
-    child.once("exit", () => {
+    proc.once("exit", () => {
       clearTimeout(timer);
       resolve();
     });
-    child.kill("SIGTERM");
+    proc.kill("SIGTERM");
   });
 }
