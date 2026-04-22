@@ -38,9 +38,18 @@ type WorkerMessage =
   | { type: "error"; message?: string };
 
 export interface SpawnedCodeServer {
-  /** Emitted when the worker process exits (other than via `close()` / `reload()`). */
+  /**
+   * Emitted when the handle loses its worker: crash, explicit kill, or a
+   * `reload()` whose respawn failed (the old worker is already gone; the
+   * failure also rejects the `reload()` promise). Not emitted for `close()`
+   * or the successful half of `reload()`.
+   */
   on(event: "exit", listener: (code: number | null, signal: NodeJS.Signals | null) => void): this;
-  /** Emitted when the worker emits an `error` (spawn failure, IPC send failure, …). */
+  /**
+   * Emitted for worker `error` events (spawn failure, IPC send failure) and
+   * for post-ready fatal errors forwarded by the worker (uncaughtException,
+   * unhandledRejection).
+   */
   on(event: "error", listener: (err: Error) => void): this;
   on(event: string, listener: (...args: unknown[]) => void): this;
 }
@@ -98,10 +107,12 @@ export class SpawnedCodeServer extends EventEmitter {
       try {
         next = await spawnWorker(this.#opts);
       } catch (err) {
-        // Spawn failed — re-attach listeners to the (now-dead) old proc so
-        // the handle stays observable. Caller gets the error and can decide
-        // to retry `reload()` or `close()`.
-        this.#detach = this.#attachListeners(this.proc);
+        // Spawn failed and the old worker is already terminated. Surface that
+        // as a synthetic `exit` so consumers don't have to poll `proc.exitCode`
+        // to notice the handle is childless. Caller can still retry `reload()`
+        // or `close()`.
+        const dead = this.proc;
+        queueMicrotask(() => this.emit("exit", dead.exitCode, dead.signalCode));
         throw err;
       }
       if (this.#closed) {
@@ -130,11 +141,18 @@ export class SpawnedCodeServer extends EventEmitter {
     const onExit = (code: number | null, signal: NodeJS.Signals | null) =>
       this.emit("exit", code, signal);
     const onError = (err: Error) => this.emit("error", err);
+    const onMessage = (msg: WorkerMessage) => {
+      if (msg?.type === "error") {
+        this.emit("error", new Error(msg.message ?? "worker error"));
+      }
+    };
     proc.on("exit", onExit);
     proc.on("error", onError);
+    proc.on("message", onMessage);
     return () => {
       proc.off("exit", onExit);
       proc.off("error", onError);
+      proc.off("message", onMessage);
     };
   }
 }
