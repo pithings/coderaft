@@ -114,7 +114,16 @@ export class SpawnedCodeServer extends EventEmitter {
       this.#detachListeners();
       await terminateChild(this.#state.child);
       if (this.#closed) throw new Error("SpawnedCodeServer was closed during reload");
-      const next = await spawnWorker(this.#opts);
+      let next: WorkerState;
+      try {
+        next = await spawnWorker(this.#opts);
+      } catch (err) {
+        // Spawn failed — re-attach listeners to the (now-dead) old child so
+        // the handle stays observable. Caller gets the error and can decide
+        // to retry `reload()` or `close()`.
+        this.#detachListeners = this.#attachListeners(this.#state.child);
+        throw err;
+      }
       if (this.#closed) {
         await terminateChild(next.child);
         throw new Error("SpawnedCodeServer was closed during reload");
