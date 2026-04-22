@@ -11,6 +11,7 @@
     "ThirdPartyNotices.txt",
     "tar.mjs",
     "code.mjs",
+    "worker.mjs",
     "android-preload.cjs",
     "code.tar.zst"
   ],
@@ -21,6 +22,7 @@
   },
   "imports": {
     "#code": "./code.mjs",
+    "#worker": "./worker.mjs",
     "#android-preload": "./android-preload.cjs"
   },
   "scripts": {
