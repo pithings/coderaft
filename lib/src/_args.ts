@@ -86,7 +86,7 @@ export const cliOptions = {
   "no-tui": { type: "boolean" },
   open: { type: "boolean", short: "o" },
   help: { type: "boolean", short: "h" },
-} as const satisfies Parameters<typeof parseArgs>[0]["options"];
+} as const satisfies NonNullable<Parameters<typeof parseArgs>[0]>["options"];
 
 export const vsKeys = [
   "server-base-path",
