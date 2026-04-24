@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.0.26
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.25...v0.0.26)
+
+### 🚀 Enhancements
+
+- SpawnCodeServer ([#6](https://github.com/pithings/coderaft/pull/6))
+- Add custom `formatURL` support ([#4](https://github.com/pithings/coderaft/pull/4))
+
+### 🌊 Types
+
+- Fix type issue ([#5](https://github.com/pithings/coderaft/pull/5))
+
+### 🏡 Chore
+
+- Update deps ([3574583](https://github.com/pithings/coderaft/commit/3574583))
+
+### ❤️ Contributors
+
+- Mickaël Alves <malves.externe@bedrockstreaming.com>
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.25
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.24...v0.0.25)
