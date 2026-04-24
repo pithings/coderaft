@@ -43,6 +43,12 @@ const ROBOTS_TXT = "User-agent: *\nDisallow: /\n";
 export interface CreateCodeServerOptions {
   /** Workspace folder opened when no input is given in the URL. */
   defaultFolder?: string;
+  /**
+   * Customize the URL returned by the server. Called with the base URL after
+   * auth params are applied. Return a modified URL, a string, or `undefined`
+   * to keep the original.
+   */
+  formatURL?: (url: URL) => string | URL | undefined;
   /** Connection token (shared auth secret). Auto-generated if omitted. */
   connectionToken?: string;
   /** Host/interface to bind (used to infer local-only access for token default). */
@@ -356,11 +362,15 @@ export async function startCodeServer(
     address && typeof address === "object" && "port" in address ? address.port : undefined;
 
   const basePath = normalizeBaseURL(opts.baseURL ?? opts.vscode?.["server-base-path"]);
-  const url = socketPath
-    ? `unix:${socketPath}`
-    : handler.connectionToken
-      ? `http://localhost:${actualPort}${basePath}/?tkn=${handler.connectionToken}`
-      : `http://localhost:${actualPort}${basePath}/`;
+  let url: string;
+  if (socketPath) {
+    url = `unix:${socketPath}`;
+  } else {
+    const baseUrl = new URL(`http://localhost:${actualPort}${basePath}/`);
+    if (handler.connectionToken) baseUrl.searchParams.set("tkn", handler.connectionToken);
+    const rawUrl = opts.formatURL ? (opts.formatURL(baseUrl) ?? baseUrl) : baseUrl;
+    url = rawUrl instanceof URL ? rawUrl.toString() : rawUrl;
+  }
 
   return {
     server,
