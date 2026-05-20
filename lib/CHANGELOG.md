@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.30
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.29...v0.0.30)
+
+### 🩹 Fixes
+
+- Use default os scheme by default ([ee2e5db](https://github.com/pithings/coderaft/commit/ee2e5db))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.29
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.28...v0.0.29)
