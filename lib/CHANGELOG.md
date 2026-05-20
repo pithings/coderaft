@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.27
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.26...v0.0.27)
+
+### 🚀 Enhancements
+
+- Update code-server to 4.117 and reduce size ([#7](https://github.com/pithings/coderaft/pull/7))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.26
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.25...v0.0.26)
