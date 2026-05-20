@@ -21,12 +21,12 @@ const extraDeps: Record<string, string> = {
 
 // Upstream deps that are not referenced by any bundled code path and
 // should never be installed (keeps the dep tree lean).
-const excludedDeps = new Set<string>([
-  "@anthropic-ai/sandbox-runtime",
-  // Bundled into dist by obuild (see lib/dist/_chunks/libs/httpxy.mjs),
-  // so it must not be listed as a runtime dep.
-  "httpxy",
-]);
+const excludedDeps = new Set<string>(["@anthropic-ai/sandbox-runtime"]);
+
+// Coderaft-specific deps not declared by upstream code-server but required
+// by `lib/src/*` (bundled into dist by obuild). Preserved across syncs so
+// the wholesale `devDependencies` replacement below does not drop them.
+const preservedDeps = new Set<string>(["httpxy"]);
 
 // Merge and sort all nested dependencies
 const nestedDeps: Record<string, string> = Object.fromEntries(
@@ -44,16 +44,22 @@ const pkgPath = join(workspacePkgDir, "package.json");
 const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
 const prevDeps = pkg.devDependencies || {};
 
-// Replace all devDependencies (keep code-server and workspace:* refs)
-pkg.devDependencies = {
-  "code-server": prevDeps["code-server"] || "^4.114.0",
-  ...nestedDeps,
-};
+// Replace all devDependencies (keep code-server, workspace:* refs, and
+// any explicitly preserved coderaft-only deps). code-server stays pinned
+// to the head of the object; everything else is sorted alphabetically.
+const carriedOver: Record<string, string> = {};
 for (const [name, version] of Object.entries<string>(prevDeps)) {
-  if (version.startsWith("workspace:")) {
-    pkg.devDependencies[name] = version;
+  if (version.startsWith("workspace:") || preservedDeps.has(name)) {
+    carriedOver[name] = version;
   }
 }
+const merged = Object.fromEntries(
+  Object.entries({ ...nestedDeps, ...carriedOver }).sort(([a], [b]) => a.localeCompare(b)),
+);
+pkg.devDependencies = {
+  "code-server": prevDeps["code-server"] || "^4.114.0",
+  ...merged,
+};
 
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 

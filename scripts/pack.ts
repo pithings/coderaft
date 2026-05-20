@@ -18,7 +18,16 @@ if (!existsSync(nodeModulesDir)) {
 const outFile = join(libDir, "code.tar.zst");
 
 const excludeDirs = new Set([".bin"]);
-const excludeDirPaths = new Set(["katex/src"]);
+const excludeDirPaths = new Set([
+  "katex/src",
+  // Copilot extension — large bundle (Copilot CLI ~13 MB, tree-sitter wasms,
+  // tokenizers). Not used in coderaft; the `@github/copilot` workspace shim
+  // already strips the npm package, and the bundled extension is dropped here.
+  "code-server/lib/vscode/extensions/copilot",
+  // Mermaid chat-features extension — webview bundle (~6 MB) for the Copilot
+  // chat panel; dead weight without the copilot extension.
+  "code-server/lib/vscode/extensions/mermaid-chat-features",
+]);
 const excludeFilePaths = new Set([
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
@@ -33,6 +42,8 @@ const excludeNameRe =
 const tarExcludes = [
   "node_modules/.bin",
   "node_modules/katex/src",
+  "node_modules/code-server/lib/vscode/extensions/copilot",
+  "node_modules/code-server/lib/vscode/extensions/mermaid-chat-features",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
   "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
