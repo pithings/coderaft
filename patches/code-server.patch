@@ -81,3 +81,101 @@ index 8c86d76950d31b943e76f815be7c133f9104f144..f85f2382e3b5d5785c5fc9b36698dcd5
  	};`}static{this._vscodeImportFnName="_VSCODE_IMPORT_VSCODE_API"}dispose(){this._store.dispose()}_installInterceptor(){let e=new eI,n=new Map;Object.defineProperty(globalThis,i._vscodeImportFnName,{enumerable:!1,configurable:!1,writable:!1,value:l=>e.getKey(l)});let{port1:o,port2:r}=new MessageChannel,s,a=o;a.onmessage=l=>{s||(s=this._factories.get("vscode"),rp(s));let{id:d,url:c}=l.data,u=y.parse(c),m=s.load("_not_used",u,()=>{throw new Error("CANNOT LOAD MODULE from here.")}),g=e.get(m);g||(g=Ee(),e.set(m,g));let h=n.get(g);if(!h){let f=`const _vscodeInstance = globalThis.${i._vscodeImportFnName}('${g}');
  
  ${Object.keys(m).map((I=>`export const ${I} = _vscodeInstance['${I}'];`)).join(`
+diff --git a/lib/vscode/product.json b/lib/vscode/product.json
+index 96e2d8277fb6f0ad17105ae25ce615837ff5b7b4..ed37bc84709d38784df53867be4da4c657f152a0 100644
+--- a/lib/vscode/product.json
++++ b/lib/vscode/product.json
+@@ -79,63 +79,7 @@
+       "publisherDisplayName": "Microsoft"
+     }
+   }],
+-  "defaultChatAgent": {
+-    "extensionId": "GitHub.copilot",
+-    "chatExtensionId": "GitHub.copilot-chat",
+-    "chatExtensionOutputId": "GitHub.copilot-chat.GitHub Copilot Chat.log",
+-    "chatExtensionOutputExtensionStateCommand": "github.copilot.debug.extensionState",
+-    "documentationUrl": "https://aka.ms/github-copilot-overview",
+-    "termsStatementUrl": "https://aka.ms/github-copilot-terms-statement",
+-    "privacyStatementUrl": "https://aka.ms/github-copilot-privacy-statement",
+-    "skusDocumentationUrl": "https://aka.ms/github-copilot-plans",
+-    "publicCodeMatchesUrl": "https://aka.ms/github-copilot-match-public-code",
+-    "manageSettingsUrl": "https://aka.ms/github-copilot-settings",
+-    "managePlanUrl": "https://aka.ms/github-copilot-manage-plan",
+-    "manageOverageUrl": "https://aka.ms/github-copilot-manage-overage",
+-    "upgradePlanUrl": "https://aka.ms/github-copilot-upgrade-plan",
+-    "signUpUrl": "https://aka.ms/github-sign-up",
+-    "provider": {
+-      "default": {
+-        "id": "github",
+-        "name": "GitHub"
+-      },
+-      "enterprise": {
+-        "id": "github-enterprise",
+-        "name": "GHE"
+-      },
+-      "google": {
+-        "id": "google",
+-        "name": "Google"
+-      },
+-      "apple": {
+-        "id": "apple",
+-        "name": "Apple"
+-      }
+-    },
+-    "providerExtensionId": "vscode.github-authentication",
+-    "providerUriSetting": "github-enterprise.uri",
+-    "providerScopes": [
+-      ["read:user", "user:email", "repo", "workflow"],
+-      ["user:email"],
+-      ["read:user"]
+-    ],
+-    "entitlementUrl": "https://api.github.com/copilot_internal/user",
+-    "entitlementSignupLimitedUrl": "https://api.github.com/copilot_internal/subscribe_limited_user",
+-    "chatQuotaExceededContext": "github.copilot.chat.quotaExceeded",
+-    "completionsQuotaExceededContext": "github.copilot.completions.quotaExceeded",
+-    "walkthroughCommand": "github.copilot.open.walkthrough",
+-    "completionsMenuCommand": "github.copilot.toggleStatusMenu",
+-    "completionsRefreshTokenCommand": "github.copilot.signIn",
+-    "chatRefreshTokenCommand": "github.copilot.refreshToken",
+-    "generateCommitMessageCommand": "github.copilot.git.generateCommitMessage",
+-    "resolveMergeConflictsCommand": "github.copilot.git.resolveMergeConflicts",
+-    "completionsAdvancedSetting": "github.copilot.advanced",
+-    "completionsEnablementSetting": "github.copilot.enable",
+-    "nextEditSuggestionsSetting": "github.copilot.nextEditSuggestions.enabled",
+-    "tokenEntitlementUrl": "https://api.github.com/copilot_internal/v2/token",
+-    "mcpRegistryDataUrl": "https://api.github.com/copilot/mcp_registry"
+-  },
+-  "trustedExtensionAuthAccess": ["vscode.git", "vscode.github", "github.vscode-pull-request-github", "github.copilot", "github.copilot-chat"],
++  "trustedExtensionAuthAccess": ["vscode.git", "vscode.github", "github.vscode-pull-request-github"],
+   "onboardingKeymaps": [{
+     "id": "vscode",
+     "label": "VS Code",
+@@ -197,7 +141,7 @@
+     "themeId": "Solarized Light",
+     "type": "light"
+   }],
+-  "builtInExtensionsEnabledWithAutoUpdates": ["GitHub.copilot-chat"],
++  "builtInExtensionsEnabledWithAutoUpdates": [],
+   "enableTelemetry": true,
+   "quality": "stable",
+   "codeServerVersion": "4.117.0",
+@@ -214,5 +158,18 @@
+   },
+   "commit": "ddeb0a3de0321412c0633dffa85d35770005ae0f",
+   "date": "2026-04-21T16:12:14-07:00",
+-  "version": "1.117.0"
++  "version": "1.117.0",
++  "configurationDefaults": {
++    "chat.disableAIFeatures": true,
++    "workbench.disableAICustomizations": true,
++    "chat.commandCenter.enabled": false,
++    "chat.agent.enabled": false,
++    "chat.mcp.enabled": false,
++    "chat.mcp.discovery.enabled": false,
++    "chat.mcp.gallery.enabled": false,
++    "chat.mcp.autostart": "never",
++    "chat.mcp.access": "none",
++    "workbench.colorTheme": "Default Dark Modern",
++    "window.autoDetectColorScheme": false
++  }
+ }

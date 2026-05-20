@@ -161,6 +161,73 @@ for (const rel of platformSwitchFiles) {
   console.log(`Patched platform switch in ${rel}`);
 }
 
+// Step 2c: Neuter the bundled Copilot Chat ("Build with Agent") wiring in
+// product.json and bake in dark-theme + chat-disabled defaults.
+//
+// The Copilot Chat extension files themselves are already stripped from the
+// shipped tarball in `scripts/pack.ts`, but VS Code core still ships the chat
+// UI (Chat view container, agent picker, "Build with Agent" heading) and
+// reads `defaultChatAgent` / `builtInExtensionsEnabledWithAutoUpdates` from
+// product.json to drive the onboarding flow. We remove those references and
+// set `chat.disableAIFeatures: true` as the master kill switch so the chat
+// UI stays inert by default.
+//
+// String-level edits (not JSON.stringify) to keep the diff minimal — product.json
+// uses a custom mixed compact/pretty layout that JSON.stringify would normalize.
+const productJsonPath = `${patchDir}/lib/vscode/product.json`;
+let productSrc = readFileSync(productJsonPath, "utf8");
+
+// 1. Drop the `defaultChatAgent` object (multiline block, ends with `},\n`).
+const defaultChatAgentRe = /^ {2}"defaultChatAgent": \{[\s\S]*?^ {2}\},\n/m;
+if (!defaultChatAgentRe.test(productSrc)) {
+  console.error("Cannot patch product.json — defaultChatAgent block not found");
+  process.exit(1);
+}
+productSrc = productSrc.replace(defaultChatAgentRe, "");
+
+// 2. Drop copilot entries from `trustedExtensionAuthAccess`.
+productSrc = productSrc.replace(/, "github\.copilot(?:-chat)?"/g, "");
+
+// 3. Empty `builtInExtensionsEnabledWithAutoUpdates`.
+productSrc = productSrc.replace(
+  /"builtInExtensionsEnabledWithAutoUpdates": \[[^\]]*\]/,
+  '"builtInExtensionsEnabledWithAutoUpdates": []',
+);
+
+// 4. Inject `configurationDefaults` (chat-disabled + dark theme) before the
+//    final closing brace. The trailing object in product.json varies between
+//    versions, so anchor on the document-final `}\n` and prepend a comma to
+//    the preceding line.
+// Both `chat.disableAIFeatures` AND `workbench.disableAICustomizations` must
+// be true to fully hide the chat setup UI (e.g. the "Sign in to use AI
+// Features" button in the Accounts menu / status bar). See `Gnn` in
+// workbench.web.main.internal.js — setup UI returns "hidden" only when both
+// are true.
+const configDefaults = {
+  "chat.disableAIFeatures": true,
+  "workbench.disableAICustomizations": true,
+  "chat.commandCenter.enabled": false,
+  "chat.agent.enabled": false,
+  // MCP (Model Context Protocol) — disable the server runtime, gallery, and
+  // discovery so VS Code doesn't scan Claude Desktop / Cursor configs or
+  // expose the "Add MCP Server" / gallery UI even if chat were re-enabled.
+  "chat.mcp.enabled": false,
+  "chat.mcp.discovery.enabled": false,
+  "chat.mcp.gallery.enabled": false,
+  "chat.mcp.autostart": "never",
+  "chat.mcp.access": "none",
+  "workbench.colorTheme": "Default Dark Modern",
+  "window.autoDetectColorScheme": false,
+};
+const configBlock =
+  '  "configurationDefaults": ' +
+  JSON.stringify(configDefaults, null, 2).replace(/\n/g, "\n  ") +
+  "\n";
+productSrc = productSrc.replace(/\n}\s*$/, `,\n${configBlock}}\n`);
+
+writeFileSync(productJsonPath, productSrc);
+console.log("Patched product.json (chat disabled, dark theme default)");
+
 // Step 3: Commit the patch
 execSync(`pnpm patch-commit '${patchDir}'`, {
   encoding: "utf8",
