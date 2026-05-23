@@ -59,6 +59,15 @@ export interface CreateCodeServerOptions {
    * routes (`/healthz`, `/_static/*`, `/proxy/*`, `/login`, …).
    */
   baseURL?: string;
+  /**
+   * URI template for proxied ports. `{{port}}` is replaced with the port number.
+   *
+   * Path-based (default): `baseURL + "/proxy/{{port}}/"` (e.g. `/code/proxy/3000/`)
+   * Subdomain-based: `https://{{port}}.proxy.example.com/`
+   *
+   * Passed to VS Code as `VSCODE_PROXY_URI`.
+   */
+  proxyURI?: string;
   /** Extra options forwarded to VS Code's `createServer()`. */
   vscode?: VSCodeServerOptions;
 }
@@ -124,6 +133,17 @@ export async function createCodeServer(
   // and extension hosts, so those processes inherit this var and the scripts
   // resolve `${NODE_EXEC_PATH:-$ROOT/lib/node}` to a real node.
   process.env.NODE_EXEC_PATH ??= process.execPath;
+
+  // VS Code's bundled web client computes `proxyEndpointTemplate` from a
+  // relative `rootEndpoint` that always resolves to `/`, ignoring the
+  // configured base path. Override via `VSCODE_PROXY_URI` so proxied-port
+  // URLs include the base path (e.g. `/api/code/proxy/{{port}}/`).
+  // Also supports subdomain templates (e.g. `https://{{port}}.proxy.example.com/`).
+  if (opts.proxyURI) {
+    process.env.VSCODE_PROXY_URI = opts.proxyURI;
+  } else if (baseURL) {
+    process.env.VSCODE_PROXY_URI ??= `${baseURL}/proxy/{{port}}/`;
+  }
 
   const userDataDir =
     opts.vscode?.["user-data-dir"] ?? join(_os.homedir(), ".vscode-server-oss", "data");

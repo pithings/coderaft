@@ -62,6 +62,7 @@ async function startMain() {
     host: values.host,
     socketPath: values["socket-path"],
     baseURL: values["base-url"] ?? values["server-base-path"],
+    proxyURI: values["proxy-uri"],
     defaultFolder: dir || values["default-folder"],
     connectionToken: values["connection-token"] ?? values.token,
     vscode,

@@ -100,6 +100,8 @@ Creates a code-server handler without binding to a port.
 | `defaultFolder`   | `string`              | Workspace folder opened when no input is given in the URL.                   |
 | `connectionToken` | `string`              | Shared auth secret. Disabled for localhost, auto-generated for remote hosts. |
 | `host`            | `string`              | Host/interface to bind. Used to infer whether to require a token.            |
+| `baseURL`         | `string`              | Base URL the server is mounted under (e.g. `/code`). Defaults to `/`.        |
+| `proxyURI`        | `string`              | Proxy URI template for forwarded ports (see [Port Proxy](#port-proxy)).      |
 | `vscode`          | `VSCodeServerOptions` | Extra options forwarded to VS Code's internal `createServer()`.              |
 
 Returns a `CodeServerHandler`:
@@ -169,11 +171,12 @@ Options cross an IPC boundary, so nested values (`vscode`, etc.) must be JSON-co
 
 | Option                        | Description                                         |
 | ----------------------------- | --------------------------------------------------- |
-| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `6063`)      |
-| `-H, --host <host>`           | Host/interface to bind                              |
-| `--base-url <path>`           | Base URL the server is mounted under (default: `/`) |
-| `--socket-path <path>`        | Path to a socket file to listen on                  |
-| `--print-startup-performance` | Print startup timing to stdout                      |
+| `-p, --port <port>`           | Port to listen on (default: `$PORT` or `6063`)                          |
+| `-H, --host <host>`           | Host/interface to bind                                                  |
+| `--base-url <path>`           | Base URL the server is mounted under (default: `/`)                     |
+| `--proxy-uri <template>`      | Proxy URI template for forwarded ports (see [Port Proxy](#port-proxy)) |
+| `--socket-path <path>`        | Path to a socket file to listen on                                      |
+| `--print-startup-performance` | Print startup timing to stdout                                          |
 
 ### Auth
 
@@ -290,6 +293,32 @@ Options cross an IPC boundary, so nested values (`vscode`, etc.) must be JSON-co
 | `--enable-smoke-test-driver`       | Enable smoke test driver            |
 | `--crash-reporter-directory <dir>` | Crash reporter directory            |
 | `--crash-reporter-id <id>`         | Crash reporter ID                   |
+
+## Port Proxy
+
+When a VS Code extension or the terminal opens a local URL (e.g. `http://localhost:3000`), coderaft proxies it through the browser. By default, ports are proxied via a path-based scheme:
+
+```
+https://example.com/proxy/3000/
+```
+
+When using `--base-url`, the base path is automatically prepended:
+
+```sh
+coderaft --base-url /code
+# → https://example.com/code/proxy/3000/
+```
+
+For subdomain-based proxying, use `--proxy-uri` with a `{{port}}` placeholder:
+
+```sh
+coderaft --proxy-uri "https://{{port}}.proxy.example.com/"
+# → https://3000.proxy.example.com/
+```
+
+Subdomain proxying requires external infrastructure (wildcard DNS + reverse proxy) — coderaft's built-in proxy handler only supports path-based routing.
+
+The `VSCODE_PROXY_URI` environment variable can also be used and takes the same template format.
 
 ## Sponsors
 

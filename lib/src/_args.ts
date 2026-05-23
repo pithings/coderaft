@@ -5,6 +5,7 @@ export const cliOptions = {
   port: { type: "string", short: "p" },
   host: { type: "string", short: "H" },
   "base-url": { type: "string" },
+  "proxy-uri": { type: "string" },
   "server-base-path": { type: "string" },
   "socket-path": { type: "string" },
   "print-startup-performance": { type: "boolean" },
@@ -143,6 +144,7 @@ export const helpText = `
     -p, --port <port>                    Port to listen on (default: $PORT or 6063)
     -H, --host <host>                    Host/interface to bind
         --base-url <path>                Base URL the server is mounted under (default: /)
+        --proxy-uri <template>           Proxy URI template ({{port}} is replaced with port number)
         --socket-path <path>             Path to a socket file to listen on
         --print-startup-performance      Print startup timing to stdout
 
