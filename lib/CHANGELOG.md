@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.0.32
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.31...v0.0.32)
+
+### 🚀 Enhancements
+
+- Support `proxyURI` ([8cd1db2](https://github.com/pithings/coderaft/commit/8cd1db2))
+- Support preinstalling extensions ([a14c12d](https://github.com/pithings/coderaft/commit/a14c12d))
+
+### 🏡 Chore
+
+- Update deps ([578217a](https://github.com/pithings/coderaft/commit/578217a))
+- Update deps ([82c9f83](https://github.com/pithings/coderaft/commit/82c9f83))
+- Fmt readme ([cbb81f4](https://github.com/pithings/coderaft/commit/cbb81f4))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.31
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.30...v0.0.31)
