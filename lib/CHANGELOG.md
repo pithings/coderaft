@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.33
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.32...v0.0.33)
+
+### 🏡 Chore
+
+- Update deps ([8154761](https://github.com/pithings/coderaft/commit/8154761))
+
+### ❤️ Contributors
+
+- Dev <dev@localhost>
+
 ## v0.0.32
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.31...v0.0.32)
