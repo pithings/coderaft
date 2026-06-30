@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
-  code-server: dcda1d6f3a4d5e3e96b5850dd21bcc36ed98f5c173b4153b06b0d7bc853ad932
+  code-server: 172475048ade60d36bb21240a33b0a2592f82b94d9be17dabeeaf65db46e3df0
 
 importers:
 
@@ -118,7 +118,7 @@ importers:
         version: 6.1.0-beta.288
       code-server:
         specifier: ^4.117.0
-        version: 4.117.0(patch_hash=dcda1d6f3a4d5e3e96b5850dd21bcc36ed98f5c173b4153b06b0d7bc853ad932)(typescript@6.0.3)
+        version: 4.117.0(patch_hash=172475048ade60d36bb21240a33b0a2592f82b94d9be17dabeeaf65db46e3df0)(typescript@6.0.3)
       cookie:
         specifier: ^0.7.0
         version: 0.7.2
@@ -2393,7 +2393,7 @@ snapshots:
     dependencies:
       readdirp: 5.0.0
 
-  code-server@4.117.0(patch_hash=dcda1d6f3a4d5e3e96b5850dd21bcc36ed98f5c173b4153b06b0d7bc853ad932)(typescript@6.0.3):
+  code-server@4.117.0(patch_hash=172475048ade60d36bb21240a33b0a2592f82b94d9be17dabeeaf65db46e3df0)(typescript@6.0.3):
     dependencies:
       '@coder/logger': 3.0.1
       argon2: 0.44.0

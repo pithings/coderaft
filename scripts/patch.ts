@@ -251,6 +251,22 @@ const configDefaults = {
   "window.autoDetectColorScheme": true,
   "workbench.startupEditor": "none",
   "workbench.secondarySideBar.defaultVisibility": "hidden",
+  // File watcher exclusions. The bundled VS Code only excludes git/hg metadata
+  // by default (no node_modules), so each window's recursive watcher indexes
+  // heavy dirs into a multi-GB JS-heap tree. `files.watcherExclude` is a merged
+  // object setting, so these are additive — user-added watches still fire.
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/.cache/**": true,
+  },
+  "search.followSymlinks": false,
+  // Bound the bundled tsserver heap. Default ceiling is 3072 MB per instance,
+  // and idle instances outlive their window (backend-scoped), so several can
+  // accumulate on a shared box. Lower the cap to limit worst-case residency.
+  "typescript.tsserver.maxTsServerMemory": 2048,
 };
 
 const serverMainPath = `${patchDir}/lib/vscode/out/server-main.js`;
