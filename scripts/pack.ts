@@ -24,9 +24,13 @@ const excludeDirPaths = new Set([
   // tokenizers). Not used in coderaft; the `@github/copilot` workspace shim
   // already strips the npm package, and the bundled extension is dropped here.
   "code-server/lib/vscode/extensions/copilot",
-  // Mermaid chat-features extension — webview bundle (~6 MB) for the Copilot
-  // chat panel; dead weight without the copilot extension.
-  "code-server/lib/vscode/extensions/mermaid-chat-features",
+  // Mermaid markdown-features extension — ~59 MB of webview bundles (mermaid.js
+  // is vendored three times: markdown-preview-out, notebook-out, chat-webview-out,
+  // ~25/25/9 MB). Alone it blows the archive past the size limit. Dropping it
+  // loses mermaid diagram rendering in the built-in preview/notebooks; the
+  // chat-webview half is dead weight anyway since we strip the copilot extension.
+  // (Renamed from `mermaid-chat-features` in code-server 4.127.)
+  "code-server/lib/vscode/extensions/mermaid-markdown-features",
 ]);
 const excludeFilePaths = new Set([
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
@@ -43,7 +47,7 @@ const tarExcludes = [
   "node_modules/.bin",
   "node_modules/katex/src",
   "node_modules/code-server/lib/vscode/extensions/copilot",
-  "node_modules/code-server/lib/vscode/extensions/mermaid-chat-features",
+  "node_modules/code-server/lib/vscode/extensions/mermaid-markdown-features",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
   "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
