@@ -892,7 +892,7 @@ packages:
     engines: {node: '>= 20.19.0'}
 
   code-server@https://github.com/coder/code-server/releases/download/v4.127.0/package.tar.gz:
-    resolution: {tarball: https://github.com/coder/code-server/releases/download/v4.127.0/package.tar.gz}
+    resolution: {integrity: sha512-8ueVpgiO4IY1fkkiHCZ3B5Nooy1LMsdQwMquPJTdwj+mxuIaDa3Pwj9JXRQyXZBpW9huDdJ7mnmvAQ6a/sraZg==, tarball: https://github.com/coder/code-server/releases/download/v4.127.0/package.tar.gz}
     version: 4.127.0
     engines: {node: '22'}
     hasBin: true
