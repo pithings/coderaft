@@ -31,7 +31,7 @@
     "build": "obuild"
   },
   "devDependencies": {
-    "code-server": "https://github.com/coder/code-server/releases/download/v4.127.0/package.tar.gz",
+    "code-server": "https://github.com/coder/code-server/releases/download/v4.128.0/package.tar.gz",
     "@github/copilot": "workspace:*",
     "@github/copilot-sdk": "workspace:*",
     "@microsoft/1ds-core-js": "workspace:*",
