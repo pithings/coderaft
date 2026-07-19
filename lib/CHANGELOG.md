@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.38
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.37...v0.0.38)
+
+### 🚀 Enhancements
+
+- Enable `workbench.experimental.modernUI` ([69efad2](https://github.com/pithings/coderaft/commit/69efad2))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.37
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.36...v0.0.37)
