@@ -126,8 +126,8 @@ importers:
         specifier: ^6.1.0-beta.288
         version: 6.1.0-beta.288
       code-server:
-        specifier: https://github.com/coder/code-server/releases/download/v4.129.0/package.tar.gz
-        version: https://github.com/coder/code-server/releases/download/v4.129.0/package.tar.gz(typescript@6.0.3)
+        specifier: https://github.com/coder/code-server/releases/download/v4.130.0/package.tar.gz
+        version: https://github.com/coder/code-server/releases/download/v4.130.0/package.tar.gz(typescript@6.0.3)
       cookie:
         specifier: ^0.7.0
         version: 0.7.2
@@ -944,9 +944,9 @@ packages:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.129.0/package.tar.gz:
-    resolution: {integrity: sha512-bOiyjOTBIiNKyXpYr2Br5ZSYAIiBcZoze17TVXef6YV618QlvSKOSZPXlVswLCqsbxlswG1P6X3YIWC3zr+9cQ==, tarball: https://github.com/coder/code-server/releases/download/v4.129.0/package.tar.gz}
-    version: 4.129.0
+  code-server@https://github.com/coder/code-server/releases/download/v4.130.0/package.tar.gz:
+    resolution: {integrity: sha512-LAlPwt8Db80gt7djRRZyj9ykfiIXDcC0fkAZtNDVoNl2NkK3QEwrj1u4xO7XTfPMUADkKUtrBmEyqPmOn4qADg==, tarball: https://github.com/coder/code-server/releases/download/v4.130.0/package.tar.gz}
+    version: 4.130.0
     engines: {node: '22'}
     hasBin: true
 
@@ -2500,7 +2500,7 @@ snapshots:
 
   chownr@3.0.0: {}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.129.0/package.tar.gz(typescript@6.0.3):
+  code-server@https://github.com/coder/code-server/releases/download/v4.130.0/package.tar.gz(typescript@6.0.3):
     dependencies:
       '@coder/logger': 3.0.1
       argon2: 0.44.0
