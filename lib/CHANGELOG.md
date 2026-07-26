@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.39
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.38...v0.0.39)
+
+### 📦 Build
+
+- Update code-server to 130 ([001d6d4](https://github.com/pithings/coderaft/commit/001d6d4))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.38
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.37...v0.0.38)
