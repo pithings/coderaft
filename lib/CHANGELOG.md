@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.41
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.40...v0.0.41)
+
+### 🩹 Fixes
+
+- **lockfile:** Restore code-server tarball integrity ([05097c9](https://github.com/pithings/coderaft/commit/05097c9))
+
+### 🏡 Chore
+
+- Format shims/README.md table ([47fe4f9](https://github.com/pithings/coderaft/commit/47fe4f9))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.40
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.39...v0.0.40)
