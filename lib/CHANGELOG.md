@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.40
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.39...v0.0.40)
+
+### 🩹 Fixes
+
+- Fix vscode-proxy-agent shim ([8dd8559](https://github.com/pithings/coderaft/commit/8dd8559))
+
+### 🏡 Chore
+
+- Update lockfile ([9df8732](https://github.com/pithings/coderaft/commit/9df8732))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.39
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.38...v0.0.39)
