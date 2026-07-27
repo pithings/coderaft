@@ -24,6 +24,13 @@ export function createProxyResolver(_params) {
   };
 }
 
+export function createProxyAuthorizationLookup(_params) {
+  // (proxyURL, proxyAuthenticate, state) => Promise<string | undefined>
+  return function lookupProxyAuthorization(_url, _proxyAuthenticate, _state) {
+    return Promise.resolve(undefined);
+  };
+}
+
 export function createHttpPatch(_params, originals, _resolveProxy) {
   return {
     get: originals.get,
@@ -77,6 +84,7 @@ export const testCertificates = [];
 export default {
   LogLevel,
   createProxyResolver,
+  createProxyAuthorizationLookup,
   createHttpPatch,
   createNetPatch,
   createTlsPatch,
