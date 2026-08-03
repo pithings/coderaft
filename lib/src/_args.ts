@@ -50,9 +50,17 @@ export const cliOptions = {
   "disable-update-check": { type: "boolean" },
   "disable-experiments": { type: "boolean" },
 
+  // Extension management (one-shot commands, mirroring the `code` CLI)
+  "install-extension": { type: "string", multiple: true },
+  "uninstall-extension": { type: "string", multiple: true },
+  "list-extensions": { type: "boolean" },
+  "show-versions": { type: "boolean" },
+  force: { type: "boolean" },
+  "pre-release": { type: "boolean" },
+
   // Features
   "enable-sync": { type: "boolean" },
-  "install-extension": { type: "string", multiple: true },
+  "preinstall-extension": { type: "string", multiple: true },
   "disable-extensions": { type: "boolean" },
   "disable-extension": { type: "string", multiple: true },
   "enable-proposed-api": { type: "string", multiple: true },
@@ -189,9 +197,17 @@ export const helpText = `
         --disable-update-check           Disable update check
         --disable-experiments            Disable experiments
 
+  Extensions (run and exit, no server):
+        --install-extension <ext-id>     Install an extension from Open VSX (repeatable)
+        --uninstall-extension <ext-id>   Uninstall an extension (repeatable)
+        --list-extensions                List installed extensions
+        --show-versions                  Show versions in --list-extensions output
+        --force                          Reinstall even if already installed
+        --pre-release                    Install the pre-release version when available
+
   Features:
         --enable-sync                    Enable settings sync
-        --install-extension <ext-id>     Preinstall an extension from Open VSX before start (repeatable)
+        --preinstall-extension <ext-id>  Install an extension before starting the server (repeatable)
         --disable-extensions             Disable all installed extensions
         --disable-extension <ext-id>     Disable specific extension (repeatable)
         --enable-proposed-api <ext-id>   Enable proposed API for extension (repeatable)

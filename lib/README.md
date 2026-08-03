@@ -186,7 +186,7 @@ const instance = await startCodeServer({
 Works with `createCodeServer`, `startCodeServer`, and `spawnCodeServer`, and on the CLI:
 
 ```sh
-coderaft --install-extension esbenp.prettier-vscode --install-extension dbaeumer.vscode-eslint
+coderaft --preinstall-extension esbenp.prettier-vscode --preinstall-extension dbaeumer.vscode-eslint
 ```
 
 - **Idempotent** — already-installed extensions are skipped, so warm restarts pay no cost. Installs run only when something is missing.
@@ -195,6 +195,18 @@ coderaft --install-extension esbenp.prettier-vscode --install-extension dbaeumer
 
 > [!NOTE]
 > Installation runs in a short-lived child process before the server boots (VS Code's extension CLI calls `process.exit()` when done). The first cold start with new extensions takes ~1s longer per extension; subsequent starts are instant.
+
+### Managing extensions without starting a server
+
+`--install-extension`, `--uninstall-extension`, and `--list-extensions` behave like the `code` CLI: they act on the extensions dir, print the result, and exit. That is what tooling which shells out to `code --install-extension <id>` (IDE extension installers, provisioning scripts) expects, so coderaft can stand in for `code` on the `PATH`.
+
+```sh
+coderaft --install-extension esbenp.prettier-vscode   # add --force to reinstall
+coderaft --list-extensions --show-versions
+coderaft --uninstall-extension esbenp.prettier-vscode
+```
+
+The exit code reflects the outcome — a spec that failed to install exits non-zero. Use `--preinstall-extension` when you want to install _and then_ serve.
 
 ## CLI Options
 
@@ -273,15 +285,28 @@ coderaft --install-extension esbenp.prettier-vscode --install-extension dbaeumer
 | `--disable-update-check`    | Disable update check                             |
 | `--disable-experiments`     | Disable experiments                              |
 
+### Extension Management
+
+These run against the extensions dir and exit without starting a server (see [Extensions](#extensions)).
+
+| Option                           | Description                                           |
+| -------------------------------- | ----------------------------------------------------- |
+| `--install-extension <ext-id>`   | Install an extension from Open VSX (repeatable)       |
+| `--uninstall-extension <ext-id>` | Uninstall an extension (repeatable)                   |
+| `--list-extensions`              | List installed extensions                             |
+| `--show-versions`                | Show versions in `--list-extensions` output           |
+| `--force`                        | Reinstall even if the extension is already installed  |
+| `--pre-release`                  | Install the pre-release version when one is available |
+
 ### Features
 
-| Option                               | Description                                                                       |
-| ------------------------------------ | --------------------------------------------------------------------------------- |
-| `--enable-sync`                      | Enable settings sync                                                              |
-| `--install-extension <ext-id>`       | Preinstall an extension from Open VSX (repeatable, see [Extensions](#extensions)) |
-| `--enable-proposed-api <ext-id>`     | Enable proposed API for an extension (repeatable)                                 |
-| `--disable-workspace-trust`          | Disable workspace trust                                                           |
-| `--disable-getting-started-override` | Disable getting started override                                                  |
+| Option                               | Description                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `--enable-sync`                      | Enable settings sync                                                                        |
+| `--preinstall-extension <ext-id>`    | Install an extension before starting the server (repeatable, see [Extensions](#extensions)) |
+| `--enable-proposed-api <ext-id>`     | Enable proposed API for an extension (repeatable)                                           |
+| `--disable-workspace-trust`          | Disable workspace trust                                                                     |
+| `--disable-getting-started-override` | Disable getting started override                                                            |
 
 ### Remote
 

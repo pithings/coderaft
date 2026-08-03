@@ -1,7 +1,39 @@
+// Extension commands can run without ever loading the server (`coderaft
+// --install-extension …`), so the Android/Termux patches — which teach forked
+// children how to exec — have to be applied from here too. Idempotent: the
+// module evaluates once per process.
+import "./_android.ts";
 import { fork } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { VSCodeServerOptions } from "./types.ts";
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const _os: typeof import("node:os") = process.getBuiltinModule?.("os") ?? require("node:os");
+
+export interface ExtensionDirs {
+  /** VS Code server data directory. */
+  serverDataDir: string;
+  /** VS Code user data directory. */
+  userDataDir: string;
+  /** Directory extensions are installed into. */
+  extensionsDir: string;
+}
+
+/**
+ * Resolve the data directories extension management and the running server must
+ * agree on, mirroring VS Code's OSS server defaults
+ * (`~/.vscode-server-oss/{,data,extensions}`).
+ */
+export function resolveExtensionDirs(vscode: VSCodeServerOptions = {}): ExtensionDirs {
+  const serverDataDir = vscode["server-data-dir"] ?? join(_os.homedir(), ".vscode-server-oss");
+  return {
+    serverDataDir,
+    userDataDir: vscode["user-data-dir"] ?? join(serverDataDir, "data"),
+    extensionsDir: vscode["extensions-dir"] ?? join(serverDataDir, "extensions"),
+  };
+}
 
 export interface EnsureExtensionsOptions {
   /** Directory extensions are installed into (must match the running server). */
@@ -76,7 +108,7 @@ export async function ensureExtensions(
     `[coderaft] Installing ${pending.length} extension${pending.length === 1 ? "" : "s"}: ${pending.join(", ")}`,
   );
 
-  await runInstall(pending, opts);
+  await forkCli({ ids: pending, ...opts });
 
   // Verify against the manifest and warn about anything that didn't land.
   const installed = readInstalledExtensions(opts.extensionsDir);
@@ -88,7 +120,58 @@ export async function ensureExtensions(
   }
 }
 
-function runInstall(specs: string[], opts: EnsureExtensionsOptions): Promise<void> {
+export interface ExtensionCommand {
+  /** Specs to install: gallery id, `id@version`, or a path to a local `.vsix`. */
+  install?: string[];
+  /** Extension ids to uninstall. */
+  uninstall?: string[];
+  /** Print the installed extensions to stdout. */
+  list?: boolean;
+  /** Append `@version` to each id in `list` output. */
+  showVersions?: boolean;
+  /** Reinstall even if the extension is already present. */
+  force?: boolean;
+  /** Install pre-release versions when available. */
+  preRelease?: boolean;
+}
+
+/**
+ * Run VS Code's own extension CLI to completion and resolve with the exit code
+ * to hand back to the shell. This backs the `code`-compatible one-shot commands
+ * (`--install-extension`, `--uninstall-extension`, `--list-extensions`), which
+ * manage extensions and exit instead of booting a server.
+ *
+ * A zero exit from the CLI is verified against the extensions manifest, so a
+ * spec that silently didn't land still reports failure to the caller.
+ */
+export async function runExtensionCommand(
+  cmd: ExtensionCommand,
+  dirs: ExtensionDirs,
+): Promise<number> {
+  const code = await forkCli({ ids: cmd.install, ...cmd, ...dirs });
+  if (code !== 0 || !cmd.install?.length) return code;
+
+  const installed = readInstalledExtensions(dirs.extensionsDir);
+  const failed = cmd.install.filter(
+    (spec) => !spec.toLowerCase().endsWith(".vsix") && !installed.has(specId(spec)),
+  );
+  if (failed.length === 0) return 0;
+
+  console.error(`[coderaft] Extension failed to install: ${failed.join(", ")}`);
+  return 1;
+}
+
+interface CliConfig extends ExtensionCommand, Partial<ExtensionDirs> {
+  /** Specs to install (the name `#install` has read since it only installed). */
+  ids?: string[];
+}
+
+/**
+ * Fork `#install` to drive VS Code's `spawnCli` and resolve with its exit code.
+ * A dedicated process is required — `spawnCli` calls `process.exit()` when the
+ * command settles, which would tear down a long-lived server.
+ */
+function forkCli(cfg: CliConfig): Promise<number> {
   const installPath = fileURLToPath(import.meta.resolve("#install"));
   return new Promise((resolve, reject) => {
     const child = fork(installPath, {
@@ -99,12 +182,15 @@ function runInstall(specs: string[], opts: EnsureExtensionsOptions): Promise<voi
       env: {
         ...process.env,
         CODERAFT_INSTALL: JSON.stringify({
-          ids: specs,
-          extensionsDir: opts.extensionsDir,
-          userDataDir: opts.userDataDir,
-          serverDataDir: opts.serverDataDir,
-          force: opts.force,
-          preRelease: opts.preRelease,
+          ids: cfg.ids,
+          uninstall: cfg.uninstall,
+          list: cfg.list,
+          showVersions: cfg.showVersions,
+          extensionsDir: cfg.extensionsDir,
+          userDataDir: cfg.userDataDir,
+          serverDataDir: cfg.serverDataDir,
+          force: cfg.force,
+          preRelease: cfg.preRelease,
         }),
       },
     });
@@ -120,12 +206,13 @@ function runInstall(specs: string[], opts: EnsureExtensionsOptions): Promise<voi
       }
     });
 
-    // Resolve regardless of exit code — `ensureExtensions` verifies the result
-    // against the manifest and warns on failures. A spawn error (e.g. missing
-    // entry file) is a real problem, so reject on that.
-    child.once("exit", () => {
+    // Report the exit code rather than throwing on it — `ensureExtensions`
+    // ignores it and verifies against the manifest instead, so a bad id never
+    // blocks startup. A spawn error (e.g. missing entry file) is a real
+    // problem, so reject on that.
+    child.once("exit", (code, signal) => {
       if (buf.trim() && !/^\s*(info|debug|trace)\s+\[/.test(buf)) console.log(buf);
-      resolve();
+      resolve(code ?? (signal ? 1 : 0));
     });
     child.once("error", reject);
   });

@@ -52,6 +52,30 @@ async function startMain() {
     vscode.logsPath = values["logs-path"];
   }
 
+  // Extension management mirrors the `code` / `code-server` CLI: these commands
+  // run against the extensions directory and exit rather than booting a server,
+  // so tooling that shells out to `code --force --install-extension <id>` and
+  // waits for it (IDE extension installers, provisioning scripts) works.
+  // `--preinstall-extension` is the flag for installing *and then* serving.
+  const install = values["install-extension"];
+  const uninstall = values["uninstall-extension"];
+  if (install?.length || uninstall?.length || values["list-extensions"]) {
+    const { resolveExtensionDirs, runExtensionCommand } = await import("./extensions.ts");
+    process.exit(
+      await runExtensionCommand(
+        {
+          install,
+          uninstall,
+          list: values["list-extensions"],
+          showVersions: values["show-versions"],
+          force: values.force,
+          preRelease: values["pre-release"],
+        },
+        resolveExtensionDirs(vscode),
+      ),
+    );
+  }
+
   const dir = positionals[0];
   if (dir) {
     vscode["disable-workspace-trust"] = true;
@@ -65,7 +89,7 @@ async function startMain() {
     proxyURI: values["proxy-uri"],
     defaultFolder: dir || values["default-folder"],
     connectionToken: values["connection-token"] ?? values.token,
-    extensions: values["install-extension"],
+    extensions: values["preinstall-extension"],
     vscode,
   };
 

@@ -15,5 +15,9 @@ export {
 export {
   ensureExtensions,
   readInstalledExtensions,
+  resolveExtensionDirs,
+  runExtensionCommand,
   type EnsureExtensionsOptions,
+  type ExtensionCommand,
+  type ExtensionDirs,
 } from "./extensions.ts";

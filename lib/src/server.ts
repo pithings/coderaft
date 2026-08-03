@@ -6,13 +6,10 @@ import { join } from "node:path";
 import type { Duplex } from "node:stream";
 import { pathToFileURL } from "node:url";
 import { createProxyServer } from "httpxy";
-import { ensureExtensions } from "./extensions.ts";
+import { ensureExtensions, resolveExtensionDirs } from "./extensions.ts";
 import { serveStatic } from "./static.ts";
 import type { VSCodeServerOptions } from "./types.ts";
 import { loadCode } from "#code";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const _os: typeof import("node:os") = process.getBuiltinModule?.("os") ?? require("node:os");
 
 // PWA manifest — matches the shape coder/code-server generates (with maskable
 // icon variants + `display_override`).
@@ -160,10 +157,7 @@ export async function createCodeServer(
 
   // Mirror VS Code's OSS server defaults (`~/.vscode-server-oss/{,data,extensions}`)
   // so lock cleanup and extension preinstall target the same dirs the server reads.
-  const serverDataDir =
-    opts.vscode?.["server-data-dir"] ?? join(_os.homedir(), ".vscode-server-oss");
-  const userDataDir = opts.vscode?.["user-data-dir"] ?? join(serverDataDir, "data");
-  const extensionsDir = opts.vscode?.["extensions-dir"] ?? join(serverDataDir, "extensions");
+  const { serverDataDir, userDataDir, extensionsDir } = resolveExtensionDirs(opts.vscode);
 
   // Remove stale workspace storage lock files left behind by ungraceful exits
   cleanupStaleLocks(userDataDir);
