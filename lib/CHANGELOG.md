@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.0.42
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.41...v0.0.42)
+
+### 🚀 Enhancements
+
+- **cli:** Support `code`-style extension management ([54d21bc](https://github.com/pithings/coderaft/commit/54d21bc))
+- Update code server to 4.133 ([dd7566b](https://github.com/pithings/coderaft/commit/dd7566b))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.41
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.40...v0.0.41)
