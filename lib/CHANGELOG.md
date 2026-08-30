@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.43
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.42...v0.0.43)
+
+### 🚀 Enhancements
+
+- Update code-server to 4.135.0 ([400b9af](https://github.com/pithings/coderaft/commit/400b9af))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.42
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.41...v0.0.42)
