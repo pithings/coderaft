@@ -45,8 +45,8 @@ importers:
         specifier: workspace:*
         version: link:../shims/1ds-post-js
       '@microsoft/mxc-sdk':
-        specifier: 0.6.1
-        version: 0.6.1
+        specifier: 0.7.0
+        version: 0.7.0
       '@parcel/watcher':
         specifier: workspace:*
         version: link:../shims/parcel-watcher
@@ -96,38 +96,38 @@ importers:
         specifier: workspace:*
         version: link:../shims/vscode-windows-registry
       '@xterm/addon-clipboard':
-        specifier: ^0.3.0-beta.292
+        specifier: ^0.3.0-beta.301
         version: 0.3.0-beta.301(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-image':
-        specifier: ^0.10.0-beta.292
+        specifier: ^0.10.0-beta.299
         version: 0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-ligatures':
-        specifier: ^0.11.0-beta.292
+        specifier: ^0.11.0-beta.299
         version: 0.11.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-progress':
-        specifier: ^0.3.0-beta.292
+        specifier: ^0.3.0-beta.299
         version: 0.3.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-search':
-        specifier: ^0.17.0-beta.292
+        specifier: ^0.17.0-beta.299
         version: 0.17.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-serialize':
-        specifier: ^0.15.0-beta.292
+        specifier: ^0.15.0-beta.299
         version: 0.15.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-unicode11':
-        specifier: ^0.10.0-beta.292
+        specifier: ^0.10.0-beta.299
         version: 0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)
       '@xterm/addon-webgl':
-        specifier: ^0.20.0-beta.291
+        specifier: ^0.20.0-beta.298
         version: 0.20.0-beta.298(@xterm/xterm@6.1.0-beta.302)
       '@xterm/headless':
-        specifier: ^6.1.0-beta.292
+        specifier: ^6.1.0-beta.301
         version: 6.1.0-beta.301
       '@xterm/xterm':
-        specifier: ^6.1.0-beta.292
+        specifier: ^6.1.0-beta.302
         version: 6.1.0-beta.302
       code-server:
-        specifier: https://github.com/coder/code-server/releases/download/v4.133.0/package.tar.gz
-        version: https://github.com/coder/code-server/releases/download/v4.133.0/package.tar.gz(typescript@6.0.3)
+        specifier: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz
+        version: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz(typescript@6.0.3)
       cookie:
         specifier: ^0.7.0
         version: 0.7.2
@@ -168,8 +168,8 @@ importers:
         specifier: ^7.5.20
         version: 7.5.22
       tas-client:
-        specifier: 0.3.1
-        version: 0.3.1
+        specifier: 0.4.3
+        version: 0.4.3
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -279,8 +279,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@microsoft/mxc-sdk@0.6.1':
-    resolution: {integrity: sha512-jpbJU/xfF4qLWcNMplDTUX/q13m2A6vYao1QN3lkZaQlzsRce95H+iU0Qu0wlweJZ2gx6eY1PRQU+/bnQki/dw==}
+  '@microsoft/mxc-sdk@0.7.0':
+    resolution: {integrity: sha512-EWhz2pKkcPluZHAOI1yneV+JK0NO/3hdh7nABBb0x4PjyUWMeSWPTBAjtIu+BhtMYOqlaijSPZMZ0Hs/J4ZL4A==}
     engines: {node: '>=18.0.0'}
 
   '@napi-rs/wasm-runtime@1.1.6':
@@ -1132,9 +1132,9 @@ packages:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.133.0/package.tar.gz:
-    resolution: {integrity: sha512-8XmGmxzlqLmOTXsK/tjwH6RYow8huzKAwggFkkElr8aFkgRE23cZDL03wEEELFoHyOIFLKr3PUqE1C6KafHfFQ==, tarball: https://github.com/coder/code-server/releases/download/v4.133.0/package.tar.gz}
-    version: 4.133.0
+  code-server@https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz:
+    resolution: {integrity: sha512-DBKwuPdGSDPiTS90rDN14OFkvkprytcgaewpi7wCQDqrm8+fXWYiG47HTALh0NOPVCDC1lUmCLeaLW2cXFBl3Q==, tarball: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz}
+    version: 4.135.0
     engines: {node: '24'}
     hasBin: true
 
@@ -1493,8 +1493,8 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
-  js-yaml@4.3.0:
-    resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
+  js-yaml@5.4.1:
+    resolution: {integrity: sha512-28R/k+NAjeuf7+CKlTxWZVExJGwVVLwY06DgEnOMz2gEpfNkDcD7QvyiVPT0xy0XXhU8vHsd4Ot42OOPdJG7dQ==}
     hasBin: true
 
   jschardet@3.1.4:
@@ -1967,8 +1967,8 @@ packages:
     resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
 
-  tas-client@0.3.1:
-    resolution: {integrity: sha512-Mn4+4t/KXEf8aIENeI1TkzpKIImzmG+FjPZ2dlaoGNFgxJqBE/pp3MT7nc2032EG4aS73E4OEcr2WiNaWW8mdA==}
+  tas-client@0.4.3:
+    resolution: {integrity: sha512-6bqNgMv7ys5PL6Zqz+EoR8J5KrhAGFjodUPkcpM80DHFakKiWcjqKiID5qxsssC/E70fcgYYWPAUK7CWS29b+Q==}
     engines: {node: '>=22'}
 
   tinybench@2.9.0:
@@ -2215,7 +2215,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@microsoft/mxc-sdk@0.6.1':
+  '@microsoft/mxc-sdk@0.7.0':
     dependencies:
       node-pty: 1.2.0-beta.14
       semver: 7.8.5
@@ -2793,7 +2793,7 @@ snapshots:
 
   chownr@3.0.0: {}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.133.0/package.tar.gz(typescript@6.0.3):
+  code-server@https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz(typescript@6.0.3):
     dependencies:
       '@coder/logger': 3.0.1
       argon2: 0.44.0
@@ -2805,7 +2805,7 @@ snapshots:
       http-proxy: 1.18.1
       httpolyglot: 0.1.2
       i18next: 26.3.6(typescript@6.0.3)
-      js-yaml: 4.3.0
+      js-yaml: 5.4.1
       limiter: 2.1.0
       pem: 1.14.8
       proxy-agent: 6.5.0
@@ -3136,7 +3136,7 @@ snapshots:
 
   jiti@2.7.0: {}
 
-  js-yaml@4.3.0:
+  js-yaml@5.4.1:
     dependencies:
       argparse: 2.0.1
 
@@ -3649,7 +3649,7 @@ snapshots:
       minizlib: 3.1.0
       yallist: 5.0.0
 
-  tas-client@0.3.1: {}
+  tas-client@0.4.3: {}
 
   tinybench@2.9.0: {}
 

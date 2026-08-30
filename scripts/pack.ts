@@ -42,6 +42,11 @@ const excludeDirPaths = new Set([
   // Linked into two locations (top-level dep + vendored under vscode).
   "@microsoft/mxc-sdk/bin",
   "code-server/lib/vscode/node_modules/@microsoft/mxc-sdk/bin",
+  // zod's TypeScript sources — ~2.9 MB, archived twice (top-level + vendored
+  // under vscode). Only reachable through the `@zod/source` export condition,
+  // which is zod's own build tooling; nothing resolves it at runtime.
+  "zod/src",
+  "code-server/lib/vscode/node_modules/zod/src",
 ]);
 const excludeFilePaths = new Set([
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
@@ -61,6 +66,8 @@ const tarExcludes = [
   "node_modules/code-server/lib/vscode/extensions/mermaid-markdown-features",
   "node_modules/@microsoft/mxc-sdk/bin",
   "node_modules/code-server/lib/vscode/node_modules/@microsoft/mxc-sdk/bin",
+  "node_modules/zod/src",
+  "node_modules/code-server/lib/vscode/node_modules/zod/src",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
   "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
