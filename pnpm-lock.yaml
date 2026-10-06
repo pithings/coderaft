@@ -32,6 +32,9 @@ importers:
 
   lib:
     devDependencies:
+      '@devcontainers/cli':
+        specifier: 0.88.0
+        version: 0.88.0
       '@github/copilot':
         specifier: workspace:*
         version: link:../shims/github-copilot
@@ -45,8 +48,8 @@ importers:
         specifier: workspace:*
         version: link:../shims/1ds-post-js
       '@microsoft/mxc-sdk':
-        specifier: 0.7.0
-        version: 0.7.0
+        specifier: 0.8.0
+        version: 0.8.0
       '@parcel/watcher':
         specifier: workspace:*
         version: link:../shims/parcel-watcher
@@ -96,38 +99,38 @@ importers:
         specifier: workspace:*
         version: link:../shims/vscode-windows-registry
       '@xterm/addon-clipboard':
-        specifier: ^0.3.0-beta.301
-        version: 0.3.0-beta.301(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.3.0-beta.303
+        version: 0.3.0-beta.303(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-image':
-        specifier: ^0.10.0-beta.299
-        version: 0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.10.0-beta.301
+        version: 0.10.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-ligatures':
-        specifier: ^0.11.0-beta.299
-        version: 0.11.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.11.0-beta.301
+        version: 0.11.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-progress':
-        specifier: ^0.3.0-beta.299
-        version: 0.3.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.3.0-beta.301
+        version: 0.3.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-search':
-        specifier: ^0.17.0-beta.299
-        version: 0.17.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.17.0-beta.301
+        version: 0.17.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-serialize':
-        specifier: ^0.15.0-beta.299
-        version: 0.15.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.15.0-beta.301
+        version: 0.15.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-unicode11':
-        specifier: ^0.10.0-beta.299
-        version: 0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.10.0-beta.301
+        version: 0.10.0-beta.301(@xterm/xterm@6.1.0-beta.304)
       '@xterm/addon-webgl':
-        specifier: ^0.20.0-beta.298
-        version: 0.20.0-beta.298(@xterm/xterm@6.1.0-beta.302)
+        specifier: ^0.20.0-beta.300
+        version: 0.20.0-beta.300(@xterm/xterm@6.1.0-beta.304)
       '@xterm/headless':
-        specifier: ^6.1.0-beta.301
-        version: 6.1.0-beta.301
+        specifier: ^6.1.0-beta.303
+        version: 6.1.0-beta.303
       '@xterm/xterm':
-        specifier: ^6.1.0-beta.302
-        version: 6.1.0-beta.302
+        specifier: ^6.1.0-beta.304
+        version: 6.1.0-beta.304
       code-server:
-        specifier: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz
-        version: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz(typescript@6.0.3)
+        specifier: https://github.com/coder/code-server/releases/download/v4.140.0/package.tar.gz
+        version: https://github.com/coder/code-server/releases/download/v4.140.0/package.tar.gz(typescript@6.0.3)
       cookie:
         specifier: ^0.7.0
         version: 0.7.2
@@ -168,8 +171,8 @@ importers:
         specifier: ^7.5.20
         version: 7.5.22
       tas-client:
-        specifier: 0.4.3
-        version: 0.4.3
+        specifier: 0.4.6
+        version: 0.4.6
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -254,6 +257,11 @@ packages:
   '@coder/logger@3.0.1':
     resolution: {integrity: sha512-G/wWSaNZW8HvQZWXlXdbZbp/MOQBPH4W1AKSEI3PBfr0qc9G+pdLrXvm3XakQpNVqmD6WFAbLfcjdG0BuoAO0g==}
 
+  '@devcontainers/cli@0.88.0':
+    resolution: {integrity: sha512-sMkruPy/icfov20mdQh2EjFYZogxvMEZptDEvg5/eMBIUOr2xr+8wlsI7nvDR6EJxoBjqoasXqgRGbiMqbaJ1w==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
   '@emnapi/core@1.11.1':
     resolution: {integrity: sha512-RSvbQmHzdKzNsLYa/wHrbc3KN4sYLKAdPZxqiM2HATqv/SBk2/ENSHpvXGaLOMcsAyz0poEGqkmmKYG3OWiJEQ==}
 
@@ -279,8 +287,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@microsoft/mxc-sdk@0.7.0':
-    resolution: {integrity: sha512-EWhz2pKkcPluZHAOI1yneV+JK0NO/3hdh7nABBb0x4PjyUWMeSWPTBAjtIu+BhtMYOqlaijSPZMZ0Hs/J4ZL4A==}
+  '@microsoft/mxc-sdk@0.8.0':
+    resolution: {integrity: sha512-pnf5QsASwp+qtRi5uth2GDjwuyG0rHWRpxCf3RbAjQ4wDTNfBX/9l0A+RVZspU2agpF3/11uWB1JisIS7WrNYg==}
     engines: {node: '>=18.0.0'}
 
   '@napi-rs/wasm-runtime@1.1.6':
@@ -854,52 +862,52 @@ packages:
     resolution: {integrity: sha512-Ywk6vXC81nUHvc9WX3uFJG/UHFLXDYJgNeUVirBLJGvmchXHdapsGeAYclNqO1thQLmykmJhSouIZV+JJS8o1A==}
     hasBin: true
 
-  '@xterm/addon-clipboard@0.3.0-beta.301':
-    resolution: {integrity: sha512-DRL0EybPhWzgndaTeakVbh/HvJF7yzxRtfNCnIudFZQaGugFYsEUZNOaV2NZev8z5kLwor6miH1j3DNMI8Paxg==}
+  '@xterm/addon-clipboard@0.3.0-beta.303':
+    resolution: {integrity: sha512-AVw9y9f50uVcI1/LIzp4vkQzPXiRad8SFHjqo33kg7wWL4jes+Z/08jWDBLGvNfYNGhmElp9H2cg/ITErex55g==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-image@0.10.0-beta.299':
-    resolution: {integrity: sha512-odxXWWAKh2KRIUgXTvQejzkzlvIbpV3aepkkS6uaQKUVYf9HUqWEhECUsUvm2pMgZtqLqGuhmynw/qvKWmHrBQ==}
+  '@xterm/addon-image@0.10.0-beta.301':
+    resolution: {integrity: sha512-PJZL4GlQ1ReIgbffFMaOAFxc3wOit21/G2UEM82RpH3hNHjn6MH8ilz3ToDeBjYuOqU7ienBaeIuMbNktX4/HA==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-ligatures@0.11.0-beta.299':
-    resolution: {integrity: sha512-+LQqYRdsrBeVLsqizO6whEpHlSUKjJWp53mf4m+9ynDTAXu2YcGB33h4etby8lDLUsh/vXeLZPW4U2rZWK1ILg==}
+  '@xterm/addon-ligatures@0.11.0-beta.301':
+    resolution: {integrity: sha512-8F3D/DHbi3W+ool0xIV90paDGJYqUU/SQ9Pdltgx2nw9QFFgjtq+OscXANhrNhDzIU80p2GCnwV0jW+a6Dal0w==}
     engines: {node: '>8.0.0'}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-progress@0.3.0-beta.299':
-    resolution: {integrity: sha512-hzAGk9UPIbDJ6O5RngTfdGTRRmdsUdBLGWoUoR3ZsEu+UK7utLKHrWV4bdYy5y2PPrkNwujoEThkVBGFh7P9hQ==}
+  '@xterm/addon-progress@0.3.0-beta.301':
+    resolution: {integrity: sha512-9V04P0yncSSOZTgNvlEo6D3xiaHxALqoxEgQqgGhf20mj2eOQE0sfVPRMtO6wJwi4uI2viORUkBuiYBObvif3g==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-search@0.17.0-beta.299':
-    resolution: {integrity: sha512-We4bbjOuLY9oZD5WN93P6STqwlJg3Q7ECSE4UIuzEmWG009yEu4di5HPW/8u7UERUdrg0+8Ds+wGWrDR0687jw==}
+  '@xterm/addon-search@0.17.0-beta.301':
+    resolution: {integrity: sha512-Dj8q+p2/5c4fcS4hag6QaXngxstnc4DdzREN/IhpGxz5a1JpW/3FnF9/JE1P1wvNLp9fApgGmZqBMW4xCF6HKg==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-serialize@0.15.0-beta.299':
-    resolution: {integrity: sha512-LYGeDgXy2CxUWhx49uL3aoDjM8s9PZhHdw553RgFszekbOAJ8AZoMmYBEnwDl/AOOYnplzcKdWdU37q9W6qTbQ==}
+  '@xterm/addon-serialize@0.15.0-beta.301':
+    resolution: {integrity: sha512-zWT0Sy5GCSTnarAXRiicu3XYHgam8DPtpkWfSLPME+A3s7U1A6Jy+ZATt8vMkatyeVOPI0GICYRuQJLZVgnVow==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-unicode11@0.10.0-beta.299':
-    resolution: {integrity: sha512-BShRMWsKqoHs9fm0L96zjC4Du5L19bvmdZffm5LPKLbVWUAZj7cjjbpXuFU9FsITIJlvjTqeNfq1vulv60zRDA==}
+  '@xterm/addon-unicode11@0.10.0-beta.301':
+    resolution: {integrity: sha512-SS5BzfbvfFIikE4xZFAtHu6n0Kl5R1ZCPx41RL2WULLSE+HFo/WmYee53tMxNK/QUjpcQWepeVB7HebCPhHnig==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/addon-webgl@0.20.0-beta.298':
-    resolution: {integrity: sha512-65jZWGSV3nu2jVyc/r2H31Q+oXnDX8IhcSquREVlDjqmfOINXhAufBj2zcK6BCgYT0jrdx7y64VFgVcQ3vAkRA==}
+  '@xterm/addon-webgl@0.20.0-beta.300':
+    resolution: {integrity: sha512-BJQiOx8I+zz2woe+/E9nWprRRPevo9slPgyOd43E8o18aG307ccsyaTJoIbSu99uqfDoVLWDRLTy91ZXTFsdig==}
     peerDependencies:
-      '@xterm/xterm': ^6.1.0-beta.301
+      '@xterm/xterm': ^6.1.0-beta.304
 
-  '@xterm/headless@6.1.0-beta.301':
-    resolution: {integrity: sha512-ApQUwq3BlHA8xlOeBKnC+1l+g95JHVl9bg7EujtUBZA9aKtweyOF9PEd/1larB0c4UF5XAf9lWjj+ICNZNR/1w==}
+  '@xterm/headless@6.1.0-beta.303':
+    resolution: {integrity: sha512-FjPRg5OF0UdloypPRZcUdtpxaxYKk7FdNArgpOaedoj7UWzinB+THZyEY7t6QHRR5bjcbz7B7s4vX0Zo5LT6aw==}
 
-  '@xterm/xterm@6.1.0-beta.302':
-    resolution: {integrity: sha512-yTlcgFDNe0ZE7U1RA1JX9oZkVOE8gKvLLh55tMHrS3/ZHkJCOWHlC0mFt3GYyWChSQ1XF+VY0iIme7ZktSaMRA==}
+  '@xterm/xterm@6.1.0-beta.304':
+    resolution: {integrity: sha512-Wq9d4qFYslYQBIan+riXotdyurtREc6v+HWdAwV6Y2JSDI9eJ1dkWm/fzYb2rCGgGnM3baiYuSK4Z6OLNKLzDw==}
 
   '@yuku-codegen/binding-darwin-arm64@0.8.0':
     resolution: {integrity: sha512-7cSJH6PaKLRBdCfiB4pM6EukvgOk5xV4tyuLOIOEqrHsbnV7brtyff7CjhZbeGozdIHoOnKOi5R7rrmCWN3QSw==}
@@ -1132,9 +1140,9 @@ packages:
     resolution: {integrity: sha512-+IxzY9BZOQd/XuYPRmrvEVjF/nqj5kgT4kEq7VofrDoM1MxoRjEWkrCC3EtLi59TVawxTAn+orJwFQcrqEN1+g==}
     engines: {node: '>=18'}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz:
-    resolution: {integrity: sha512-DBKwuPdGSDPiTS90rDN14OFkvkprytcgaewpi7wCQDqrm8+fXWYiG47HTALh0NOPVCDC1lUmCLeaLW2cXFBl3Q==, tarball: https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz}
-    version: 4.135.0
+  code-server@https://github.com/coder/code-server/releases/download/v4.140.0/package.tar.gz:
+    resolution: {integrity: sha512-ips/VlJmFu9/FUyBij37bObPfvGkM0kjggu6j0UHlvbTNCbD2oy4xphUxxsq4DhwXKb2ykBS3eTUrRTskwsYBw==, tarball: https://github.com/coder/code-server/releases/download/v4.140.0/package.tar.gz}
+    version: 4.140.0
     engines: {node: '24'}
     hasBin: true
 
@@ -1967,8 +1975,8 @@ packages:
     resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
 
-  tas-client@0.4.3:
-    resolution: {integrity: sha512-6bqNgMv7ys5PL6Zqz+EoR8J5KrhAGFjodUPkcpM80DHFakKiWcjqKiID5qxsssC/E70fcgYYWPAUK7CWS29b+Q==}
+  tas-client@0.4.6:
+    resolution: {integrity: sha512-mmefC5nu8YZ5zGY4IyeXWnvK6YWv2YCz60/7q5banNU+R8JGZT2Q4lOS4g4xJyvnQIbqBFXzMFPsIitI8kVXqA==}
     engines: {node: '>=22'}
 
   tinybench@2.9.0:
@@ -2180,6 +2188,8 @@ snapshots:
 
   '@coder/logger@3.0.1': {}
 
+  '@devcontainers/cli@0.88.0': {}
+
   '@emnapi/core@1.11.1':
     dependencies:
       '@emnapi/wasi-threads': 1.2.2
@@ -2215,7 +2225,7 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@microsoft/mxc-sdk@0.7.0':
+  '@microsoft/mxc-sdk@0.8.0':
     dependencies:
       node-pty: 1.2.0-beta.14
       semver: 7.8.5
@@ -2565,43 +2575,43 @@ snapshots:
 
   '@vscode/vscode-languagedetection@1.0.23': {}
 
-  '@xterm/addon-clipboard@0.3.0-beta.301(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-clipboard@0.3.0-beta.303(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-image@0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-image@0.10.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-ligatures@0.11.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-ligatures@0.11.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
       lru-cache: 11.5.2
       opentype.js: 2.0.0
 
-  '@xterm/addon-progress@0.3.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-progress@0.3.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-search@0.17.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-search@0.17.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-serialize@0.15.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-serialize@0.15.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-unicode11@0.10.0-beta.299(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-unicode11@0.10.0-beta.301(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/addon-webgl@0.20.0-beta.298(@xterm/xterm@6.1.0-beta.302)':
+  '@xterm/addon-webgl@0.20.0-beta.300(@xterm/xterm@6.1.0-beta.304)':
     dependencies:
-      '@xterm/xterm': 6.1.0-beta.302
+      '@xterm/xterm': 6.1.0-beta.304
 
-  '@xterm/headless@6.1.0-beta.301': {}
+  '@xterm/headless@6.1.0-beta.303': {}
 
-  '@xterm/xterm@6.1.0-beta.302': {}
+  '@xterm/xterm@6.1.0-beta.304': {}
 
   '@yuku-codegen/binding-darwin-arm64@0.8.0':
     optional: true
@@ -2793,7 +2803,7 @@ snapshots:
 
   chownr@3.0.0: {}
 
-  code-server@https://github.com/coder/code-server/releases/download/v4.135.0/package.tar.gz(typescript@6.0.3):
+  code-server@https://github.com/coder/code-server/releases/download/v4.140.0/package.tar.gz(typescript@6.0.3):
     dependencies:
       '@coder/logger': 3.0.1
       argon2: 0.44.0
@@ -3649,7 +3659,7 @@ snapshots:
       minizlib: 3.1.0
       yallist: 5.0.0
 
-  tas-client@0.4.3: {}
+  tas-client@0.4.6: {}
 
   tinybench@2.9.0: {}
 
