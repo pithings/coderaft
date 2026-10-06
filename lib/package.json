@@ -1,6 +1,6 @@
 {
   "name": "coderaft",
-  "version": "0.0.43",
+  "version": "0.0.44",
   "repository": "pithings/coderaft",
   "bin": {
     "coderaft": "./dist/cli.mjs"

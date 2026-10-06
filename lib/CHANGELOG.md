@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.0.44
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.43...v0.0.44)
+
+### 🚀 Enhancements
+
+- Update code-server to 4.140.0 ([6861b1a](https://github.com/pithings/coderaft/commit/6861b1a))
+
+### 🔥 Performance
+
+- **server:** Serve static assets brotli/gzip-compressed ([fccae98](https://github.com/pithings/coderaft/commit/fccae98))
+
+### 🩹 Fixes
+
+- **server:** Resolve workbench root endpoint under base URL ([d64c5bd](https://github.com/pithings/coderaft/commit/d64c5bd))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+
 ## v0.0.43
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.42...v0.0.43)
