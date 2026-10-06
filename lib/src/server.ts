@@ -145,9 +145,8 @@ export async function createCodeServer(
   process.env.NODE_EXEC_PATH ??= process.execPath;
 
   // VS Code's bundled web client computes `proxyEndpointTemplate` from a
-  // relative `rootEndpoint` that always resolves to `/`, ignoring the
-  // configured base path. Override via `VSCODE_PROXY_URI` so proxied-port
-  // URLs include the base path (e.g. `/api/code/proxy/{{port}}/`).
+  // relative `rootEndpoint`. Pin an absolute template via `VSCODE_PROXY_URI`
+  // so proxied-port URLs include the base path (e.g. `/api/code/proxy/{{port}}/`).
   // Also supports subdomain templates (e.g. `https://{{port}}.proxy.example.com/`).
   if (opts.proxyURI) {
     process.env.VSCODE_PROXY_URI = opts.proxyURI;
@@ -335,6 +334,15 @@ export async function createCodeServer(
         return;
       }
 
+      // VS Code derives the workbench's relative `rootEndpoint` (used for
+      // `{{BASE}}` favicons, `/update/check`, the service worker path) from
+      // the depth of `req.originalUrl ?? req.url`. Under a base URL that depth
+      // includes the base segments, so `/code/` yields `./..` and everything
+      // resolves to the host root (`/update/check`) — outside coderaft. Hand
+      // it the base-stripped URL so those resolve under the base path.
+      if (baseURL) {
+        (req as IncomingMessage & { originalUrl?: string }).originalUrl = strippedUrl;
+      }
       vscodeServer.handleRequest(req, res);
     },
     handleUpgrade(req: IncomingMessage, socket: Duplex, _head: Buffer) {
