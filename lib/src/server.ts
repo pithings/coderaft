@@ -191,6 +191,9 @@ export async function createCodeServer(
     _product.nameLong = "coderaft";
     _product.applicationName = "coderaft";
   }
+  // VS Code serves its own assets under `/{quality}-{commit}/static/*`
+  // (mirrors `getProductPath()` in server-main.js).
+  const staticPrefix = `/${_product?.quality ?? "oss"}-${_product?.commit ?? "dev"}/static/`;
   const serverModule = await mod.loadCodeWithNls();
   const vscodeServer = await serverModule.createServer(null, {
     "default-folder": defaultFolder,
@@ -297,13 +300,26 @@ export async function createCodeServer(
       // `code-server` npm package root (PWA icons, service worker, etc.).
       // Upstream vscode's own `/static/*` is handled separately by handleRequest.
       if (url.startsWith("/_static/")) {
-        serveStatic(res, join(modulesDir, "code-server"), url.slice("/_static/".length)).then(
+        serveStatic(req, res, join(modulesDir, "code-server"), url.slice("/_static/".length)).then(
           (served) => {
             if (!served) {
               vscodeServer.handleRequest(req, res);
             }
           },
         );
+        return;
+      }
+
+      // VS Code's own `/{quality}-{commit}/static/*` assets (the ~18 MiB
+      // workbench bundle, nls, workers, wasm). Served here instead of by VS
+      // Code so they go out brotli/gzip-compressed; same root, same immutable
+      // caching. Falls through to VS Code for anything we don't find.
+      if ((method === "GET" || method === "HEAD") && url.startsWith(staticPrefix)) {
+        serveStatic(req, res, vsRootPath, url.slice(staticPrefix.length)).then((served) => {
+          if (!served) {
+            vscodeServer.handleRequest(req, res);
+          }
+        });
         return;
       }
 
