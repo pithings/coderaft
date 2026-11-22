@@ -93,6 +93,7 @@ export const cliOptions = {
   "force-user-env": { type: "boolean" },
 
   "no-fork": { type: "boolean" },
+  // Deprecated no-op (the interactive TUI was removed); kept so existing invocations still parse.
   "no-tui": { type: "boolean" },
   open: { type: "boolean", short: "o" },
   help: { type: "boolean", short: "h" },
@@ -238,7 +239,6 @@ export const helpText = `
         --crash-reporter-id <id>         Crash reporter ID
 
         --no-fork                        Run server in the main process (no subprocess)
-        --no-tui                         Disable interactive terminal UI
     -o, --open                           Open in browser on startup
     -h, --help                           Show this help message
 `;

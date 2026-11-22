@@ -2,7 +2,7 @@
 
 import { fork, exec } from "node:child_process";
 import type { VSCodeServerOptions } from "./types.ts";
-import { createTUI, BANNER, BANNER_LINES } from "./_tui.ts";
+import { BANNER } from "./_banner.ts";
 
 if (process.argv.includes("--worker")) {
   startWorker();
@@ -93,23 +93,6 @@ async function startMain() {
     vscode,
   };
 
-  const interactive = process.stdout.isTTY && !values["no-tui"];
-  const HEADER_LINES = BANNER_LINES + 4; // banner + blank + status + hints + separator
-
-  // Enter alt screen early so startup logs are captured
-  let tui: ReturnType<typeof createTUI> | undefined;
-  let serverURL = "";
-  if (interactive) {
-    tui = createTUI(HEADER_LINES, {
-      onOpen: () => {
-        if (serverURL) openBrowser(serverURL);
-      },
-    });
-  }
-
-  // Ensure alt screen is left on any exit path
-  process.on("exit", () => tui?.destroy());
-
   if (values["no-fork"]) {
     // Run server directly in the main process
     const { startCodeServer } = await import("./server.ts");
@@ -117,7 +100,6 @@ async function startMain() {
     let handle: Awaited<ReturnType<typeof startCodeServer>> | undefined;
     let shuttingDown = false;
     const shutdown = () => {
-      tui?.destroy();
       if (shuttingDown) {
         process.exit(0);
       }
@@ -137,19 +119,11 @@ async function startMain() {
   } else {
     // Fork worker subprocess (re-exec self with --worker)
     const child = fork(process.argv[1]!, ["--worker"], {
-      stdio: ["ignore", "pipe", "pipe", "ipc"],
-      env: { ...process.env, FORCE_COLOR: "1" },
+      stdio: ["ignore", "inherit", "inherit", "ipc"],
     });
-
-    // Pipe child output through the TUI (or straight to parent stdout/stderr)
-    // With "pipe" stdio, child output must be forwarded manually.
-    // When TUI is active, process.stdout.write is overridden to capture into the log buffer.
-    child.stdout!.on("data", (chunk: Buffer) => process.stdout.write(chunk));
-    child.stderr!.on("data", (chunk: Buffer) => console.error(chunk.toString()));
 
     let shuttingDown = false;
     const shutdown = () => {
-      tui?.destroy();
       if (shuttingDown) {
         process.exit(0);
       }
@@ -174,15 +148,8 @@ async function startMain() {
   }
 
   function onReady(url: string) {
-    serverURL = url;
-
     if (values.open) {
       openBrowser(url);
-    }
-
-    if (tui) {
-      tui.setURL(url);
-      return;
     }
 
     const c = {

@@ -333,11 +333,10 @@ These run against the extensions dir and exit without starting a server (see [Ex
 
 ### Other
 
-| Option       | Description                                            |
-| ------------ | ------------------------------------------------------ |
-| `--no-fork`  | Run server in the main process (no subprocess)         |
-| `--no-tui`   | Disable interactive terminal UI (alt screen with logs) |
-| `-o, --open` | Open in browser on startup                             |
+| Option       | Description                                    |
+| ------------ | ---------------------------------------------- |
+| `--no-fork`  | Run server in the main process (no subprocess) |
+| `-o, --open` | Open in browser on startup                     |
 
 ### Debugging
 
