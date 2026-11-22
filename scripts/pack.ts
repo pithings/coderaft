@@ -1,9 +1,19 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { execSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { join, relative } from "node:path";
-import { platform } from "node:os";
+import { execFileSync } from "node:child_process";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname, join, relative } from "node:path";
+import { platform, tmpdir } from "node:os";
+import { isRewriteCandidate, rewriteRegisterHooks } from "./bun-compat.ts";
 
 const maxSizeMB = platform() === "darwin" ? 35 : 25;
 
@@ -85,9 +95,7 @@ const tarExcludes = [
   "LICENSE",
   "LICENSE.md",
   "LICENSE.txt",
-]
-  .map((p) => `--exclude='${p}'`)
-  .join(" ");
+].map((p) => `--exclude=${p}`);
 
 // TypeScript's lib.*.d.ts files are required by tsserver for IntelliSense.
 const keepDts = new Set(["typescript/lib"]);
@@ -218,8 +226,20 @@ printStats();
 const overallHash = createHash("sha256");
 type FileInfo = { path: string; size: number; hash: string; key: string };
 const fileInfos: FileInfo[] = [];
+// Files whose archived content differs from lib/node_modules (see bun-compat.ts).
+// The installed tree is left untouched; these copies replace the originals in
+// the archive. Hashed post-rewrite so a rewrite change invalidates the cache.
+const rewritten = new Map<string, Buffer>();
 for (const file of files) {
-  const content = readFileSync(join(nodeModulesDir, file));
+  let content = readFileSync(join(nodeModulesDir, file));
+  if (isRewriteCandidate(file) && content.includes("registerHooks")) {
+    const src = content.toString("utf8");
+    const out = rewriteRegisterHooks(src);
+    if (out !== src) {
+      content = Buffer.from(out, "utf8");
+      rewritten.set(file, content);
+    }
+  }
   const fileHash = createHash("sha256").update(content).digest("hex").slice(0, 12);
   overallHash.update(file);
   overallHash.update(content);
@@ -227,6 +247,7 @@ for (const file of files) {
   fileInfos.push({ path: file, size: content.length, hash: fileHash, key: extKey(name) });
 }
 const contentHash = overallHash.digest("hex").slice(0, 16);
+for (const file of rewritten.keys()) console.log(`Rewrote for Bun compat: ${file}`);
 
 // Write file listing grouped by extension, sorted by size
 const grouped = new Map<string, FileInfo[]>();
@@ -264,9 +285,7 @@ const hashChanged = updatedCodeMjs !== codeMjs;
 
 if (hashChanged || !existsSync(outFile)) {
   console.log("Packing lib/node_modules...");
-  execSync(`tar -C ${libDir} ${tarExcludes} -chf - node_modules | zstd -19 -T0 -f -o ${outFile}`, {
-    stdio: "inherit",
-  });
+  packArchive();
   const sizeBytes = statSync(outFile).size;
   const sizeMB = (sizeBytes / 1024 / 1024).toFixed(1);
   console.log(`Packed to ${outFile} (${sizeMB} MB, hash: ${contentHash})`);
@@ -287,4 +306,39 @@ if (hashChanged || !existsSync(outFile)) {
 if (hashChanged) {
   writeFileSync(codeMjsPath, updatedCodeMjs);
   console.log("Updated codeArchiveHash in code.mjs");
+}
+
+// tar lib/node_modules with the rewritten files swapped in: the originals are
+// excluded from the main pass and the rewritten copies are appended from a
+// staging dir under the same archive paths. Goes through an uncompressed temp
+// tar because appending (-r) doesn't work on a stream; both GNU tar and bsdtar
+// support it on a file.
+function packArchive(): void {
+  const stageDir = mkdtempSync(join(tmpdir(), "coderaft-pack-"));
+  try {
+    const tarFile = join(stageDir, "code.tar");
+    const members = [...rewritten.keys()].map((file) => `node_modules/${file}`);
+    const run = (cmd: string, args: string[]) => execFileSync(cmd, args, { stdio: "inherit" });
+
+    run("tar", [
+      "-C",
+      libDir,
+      ...tarExcludes,
+      ...members.map((m) => `--exclude=${m}`),
+      "-chf",
+      tarFile,
+      "node_modules",
+    ]);
+    if (members.length > 0) {
+      for (const [file, content] of rewritten) {
+        const dest = join(stageDir, "node_modules", file);
+        mkdirSync(dirname(dest), { recursive: true });
+        writeFileSync(dest, content);
+      }
+      run("tar", ["-C", stageDir, "-rf", tarFile, ...members]);
+    }
+    run("zstd", ["-19", "-T0", "-f", tarFile, "-o", outFile]);
+  } finally {
+    rmSync(stageDir, { recursive: true, force: true });
+  }
 }
