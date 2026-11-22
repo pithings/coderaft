@@ -93,6 +93,9 @@ async function startMain() {
     vscode,
   };
 
+  // Print the banner up front so server startup logs follow it.
+  console.log(`\n${BANNER}`);
+
   if (values["no-fork"]) {
     // Run server directly in the main process
     const { startCodeServer } = await import("./server.ts");
@@ -161,8 +164,7 @@ async function startMain() {
     const rss = process.memoryUsage.rss();
     const mem = `${(rss / 1024 / 1024).toFixed(0)} MB`;
     console.log(
-      `\n${BANNER}\n` +
-        `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Ready${c.reset} ${c.dim}at${c.reset} ${c.cyan}${url}${c.reset}` +
+      `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Ready${c.reset} ${c.dim}at${c.reset} ${c.cyan}${url}${c.reset}` +
         `\n  ${c.bold}${c.cyan}➜${c.reset}  ${c.bold}Memory${c.reset} ${c.dim}${mem}${c.reset}\n`,
     );
   }
