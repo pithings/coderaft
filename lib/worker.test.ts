@@ -1,5 +1,4 @@
-// Integration coverage for the worker's `Canceled`-rejection filter
-// (lib/worker.mjs).
+// Integration coverage for the worker's fatal-error filtering (lib/worker.mjs).
 //
 // The worker is a forked entry that imports the built code-server from
 // ./dist/index.mjs, so these tests run the *actual shipped* worker.mjs bytes
@@ -8,8 +7,9 @@
 // then exit 1) is exercised end-to-end.
 //
 // Cases mirror the production crash loop:
-//   - a `Canceled` rejection (by name OR message — the cancelled ptyHost
-//     resolved-variables RPC shape) must NOT terminate the worker;
+//   - a VS Code `CancellationError` (name AND message "Canceled") must NOT
+//     terminate the worker, whether it arrives as a rejection or an exception;
+//   - a rejection that gets a handler within the grace period is not fatal;
 //   - any other rejection must still be forwarded to the parent and exit 1,
 //     so SpawnedCodeServer's respawn contract is unchanged.
 
@@ -23,15 +23,19 @@ import { afterEach, describe, expect, it } from "vitest";
 const workerSource = readFileSync(fileURLToPath(new URL("./worker.mjs", import.meta.url)), "utf8");
 
 type WorkerMessage = { type: string } & Record<string, unknown>;
+type ExitResult = { code: number | null; signal: NodeJS.Signals | null };
 
 interface WorkerHarness {
   child: ChildProcess;
   messages: WorkerMessage[];
   /** Mutable container — the `data` callback fills it after `fork()` returns. */
   stderr: { text: string };
-  exit: Promise<{ code: number | null; signal: NodeJS.Signals | null }>;
+  exit: Promise<ExitResult>;
+  exited: boolean;
   dir: string;
 }
+
+const running: WorkerHarness[] = [];
 
 function spawnWorker(serverBody: string): WorkerHarness {
   const dir = mkdtempSync(join(tmpdir(), "coderaft-worker-test-"));
@@ -44,107 +48,134 @@ function spawnWorker(serverBody: string): WorkerHarness {
 
   const child = fork(join(dir, "worker.mjs"), {
     stdio: ["ignore", "pipe", "pipe", "ipc"],
+    env: { ...process.env, NODE_OPTIONS: "" },
   });
-  const messages: WorkerMessage[] = [];
-  const stderr: { text: string } = { text: "" };
-  child.on("message", (msg) => messages.push(msg as WorkerMessage));
+  const harness: WorkerHarness = {
+    child,
+    messages: [],
+    stderr: { text: "" },
+    exit: undefined as unknown as Promise<ExitResult>,
+    exited: false,
+    dir,
+  };
+  // Register before anything can fail so afterEach always cleans up.
+  running.push(harness);
+  child.on("message", (msg) => harness.messages.push(msg as WorkerMessage));
   child.stderr?.on("data", (chunk: Buffer) => {
-    stderr.text += chunk.toString();
+    harness.stderr.text += chunk.toString();
   });
-  const exit = new Promise<{ code: number | null; signal: NodeJS.Signals | null }>((resolve) => {
-    child.once("exit", (code, signal) => resolve({ code, signal }));
+  harness.exit = new Promise<ExitResult>((resolve) => {
+    child.once("exit", (code, signal) => {
+      harness.exited = true;
+      resolve({ code, signal });
+    });
   });
-  return { child, messages, stderr, exit, dir };
+  return harness;
 }
 
 const READY_HANDLE =
   `return { url: "http://127.0.0.1:8080", port: 8080, ` +
-  `socketPath: undefined, connectionToken: "test" };`;
+  `socketPath: undefined, connectionToken: "test", close: async () => {} };`;
+
+/** A VS Code `CancellationError` — name and message are both "Canceled". */
+const CANCELLATION_ERROR = `Object.assign(new Error("Canceled"), { name: "Canceled" })`;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function startWorker(serverBody: string): Promise<WorkerHarness> {
   const harness = spawnWorker(serverBody);
   harness.child.send({ type: "start", opts: {} });
-  await waitForReady(harness);
+  await waitFor(() => harness.messages.some((m) => m.type === "ready"), "worker ready");
   return harness;
 }
 
-function waitForReady(harness: WorkerHarness, timeoutMs = 2000): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const started = Date.now();
-    const poll = () => {
-      if (harness.messages.some((m) => m.type === "ready")) {
-        resolve();
-      } else if (Date.now() - started > timeoutMs) {
-        reject(new Error("worker did not become ready"));
-      } else {
-        setTimeout(poll, 10);
-      }
-    };
-    poll();
-  });
+async function waitFor(check: () => boolean, what: string, timeoutMs = 3000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (!check()) {
+    if (Date.now() > deadline) throw new Error(`timed out waiting for ${what}`);
+    await delay(10);
+  }
 }
 
-describe("worker unhandledRejection filter", () => {
-  const running: WorkerHarness[] = [];
+async function expectStaysAlive(harness: WorkerHarness): Promise<void> {
+  // Outlast the worker's 1s unhandled-rejection grace period.
+  await delay(1300);
+  expect(harness.messages.some((m) => m.type === "error")).toBe(false);
+  expect(harness.exited).toBe(false);
+}
 
+describe("worker fatal-error filter", () => {
   afterEach(async () => {
     for (const harness of running) {
-      harness.child.kill("SIGTERM");
-      await Promise.race([harness.exit, delay(1000)]);
+      if (!harness.exited) {
+        harness.child.kill("SIGTERM");
+        await Promise.race([harness.exit, delay(1000)]);
+        if (!harness.exited) {
+          harness.child.kill("SIGKILL");
+          await harness.exit;
+        }
+      }
       rmSync(harness.dir, { recursive: true, force: true });
     }
     running.length = 0;
   });
 
-  it("does not terminate on a Canceled rejection (by name)", async () => {
+  it("does not terminate on a Canceled rejection, and logs it once", async () => {
     const harness = await startWorker(`
       setTimeout(() => {
-        Promise.reject(Object.assign(new Error("canceled"), { name: "Canceled" }));
+        Promise.reject(${CANCELLATION_ERROR});
+        Promise.reject(${CANCELLATION_ERROR});
       }, 20);
       ${READY_HANDLE}
     `);
-    running.push(harness);
 
-    await delay(200);
-
-    expect(harness.messages.some((m) => m.type === "error")).toBe(false);
-    expect(harness.child.exitCode).toBeNull();
-    expect(harness.stderr.text).toContain("ignoring Canceled rejection");
+    await waitFor(() => harness.stderr.text.includes("ignoring Canceled error"), "log line");
+    await expectStaysAlive(harness);
+    expect(harness.stderr.text.split("ignoring Canceled error").length - 1).toBe(1);
   });
 
-  it("does not terminate on a Canceled rejection (by message)", async () => {
+  it("does not terminate on a Canceled uncaught exception", async () => {
     const harness = await startWorker(`
-      setTimeout(() => {
-        Promise.reject(new Error("Canceled"));
-      }, 20);
+      setTimeout(() => { throw ${CANCELLATION_ERROR}; }, 20);
       ${READY_HANDLE}
     `);
-    running.push(harness);
 
-    await delay(200);
-
-    expect(harness.messages.some((m) => m.type === "error")).toBe(false);
-    expect(harness.child.exitCode).toBeNull();
-    expect(harness.stderr.text).toContain("ignoring Canceled rejection");
+    await waitFor(() => harness.stderr.text.includes("ignoring Canceled error"), "log line");
+    await expectStaysAlive(harness);
   });
 
-  it("forwards a non-Canceled rejection to the parent and exits 1", async () => {
+  it("does not terminate when a rejection is handled within the grace period", async () => {
     const harness = await startWorker(`
       setTimeout(() => {
-        Promise.reject(new Error("ptyHost resolve failed"));
+        const p = Promise.reject(new Error("handled later"));
+        setTimeout(() => p.catch(() => {}), 100);
       }, 20);
       ${READY_HANDLE}
     `);
-    running.push(harness);
 
-    const result = await Promise.race([harness.exit, delay(2000).then(() => null)]);
+    await expectStaysAlive(harness);
+  });
+
+  it.each([
+    ["a non-Canceled error", `new Error("ptyHost resolve failed")`, "ptyHost resolve failed"],
+    ["an Error whose message alone is Canceled", `new Error("Canceled")`, "Canceled"],
+    [
+      "an Error named Canceled with a real message",
+      `Object.assign(new Error("disk full"), { name: "Canceled" })`,
+      "disk full",
+    ],
+  ])("forwards %s to the parent and exits 1", async (_label, error, expected) => {
+    const harness = await startWorker(`
+      setTimeout(() => { Promise.reject(${error}); }, 20);
+      ${READY_HANDLE}
+    `);
+
+    const result = await Promise.race([harness.exit, delay(3000).then(() => null)]);
 
     expect(result?.code).toBe(1);
     const forwarded = harness.messages.find((m) => m.type === "error");
     expect(forwarded).toBeDefined();
     expect(String(forwarded?.message)).toContain("unhandledRejection");
-    expect(String(forwarded?.message)).toContain("ptyHost resolve failed");
+    expect(String(forwarded?.message)).toContain(expected);
   });
 });
