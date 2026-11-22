@@ -47,6 +47,12 @@ const excludeDirPaths = new Set([
   // which is zod's own build tooling; nothing resolves it at runtime.
   "zod/src",
   "code-server/lib/vscode/node_modules/zod/src",
+  // Desktop Agents ("sessions") window media — ~18.5 MB, almost all of it two
+  // animated chat backgrounds (koi-dark/light.webp, ~9 MB each, incompressible).
+  // Added in code-server 4.146; pushed the archive to ~41 MB. Only static
+  // media is copied here — the sessions window code is not part of the
+  // web/server build and nothing in the shipped bundles references these files.
+  "code-server/lib/vscode/out/vs/sessions",
 ]);
 const excludeFilePaths = new Set([
   "@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
@@ -68,6 +74,7 @@ const tarExcludes = [
   "node_modules/code-server/lib/vscode/node_modules/@microsoft/mxc-sdk/bin",
   "node_modules/zod/src",
   "node_modules/code-server/lib/vscode/node_modules/zod/src",
+  "node_modules/code-server/lib/vscode/out/vs/sessions",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-c-sharp.wasm",
   "node_modules/@vscode/tree-sitter-wasm/wasm/tree-sitter-ruby.wasm",
   "node_modules/code-server/lib/vscode/extensions/microsoft-authentication/dist/libmsalruntime.so",
