@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.0.45
+
+[compare changes](https://github.com/pithings/coderaft/compare/v0.0.44...v0.0.45)
+
+### 🚀 Enhancements
+
+- Update code-server to 4.146.0 ([e745265](https://github.com/pithings/coderaft/commit/e745265))
+
+### 🩹 Fixes
+
+- **shims:** Cover sqlite3 storage API and new copilot-sdk exports ([a86733d](https://github.com/pithings/coderaft/commit/a86733d))
+- **worker:** Ignore Canceled unhandled rejections ([#9](https://github.com/pithings/coderaft/pull/9))
+- **pack:** Rewrite `module.registerHooks` uses for Bun compat ([9aa7f83](https://github.com/pithings/coderaft/commit/9aa7f83))
+- **cli:** Print banner before server startup logs ([08896e0](https://github.com/pithings/coderaft/commit/08896e0))
+
+### 💅 Refactors
+
+- **cli:** Remove interactive TUI, always use plain output ([0c4f4a1](https://github.com/pithings/coderaft/commit/0c4f4a1))
+
+### ❤️ Contributors
+
+- Pooya Parsa ([@pi0](https://github.com/pi0))
+- Kaza Naga Sai Vishnu ([@kazablock](https://github.com/kazablock))
+
 ## v0.0.44
 
 [compare changes](https://github.com/pithings/coderaft/compare/v0.0.43...v0.0.44)
